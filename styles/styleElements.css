@@ -1,0 +1,272 @@
+        /* generall styles */
+        
+        .elemStruct {
+            background-color: white;
+            cursor: pointer;
+            width: 100%;
+			overflow: hidden;
+			text-overflow: word-wrap;
+        }
+        
+        .elemStruct.selectedActive {
+            border: 2px solid #FFD700;
+        }
+        
+        .elemStruct:not(:first-child) {
+            border-top: 1px solid black;
+        }
+        
+        .elemStruct>.innerElements {
+            border: 1px solid black;
+            border-right: none;
+            min-height: 2em;
+            width: calc(100% - 2em -2px);
+            margin-left: 2em;
+            cursor: auto;
+            background: #ececec;
+        }
+        
+        .elemStruct>.elemHeader .elemTitle {
+            vertical-align: middle;
+            padding: 0.5em;
+            word-break: break-all;
+            overflow: hidden;
+            text-overflow: clip;
+            padding-left: 3%;
+            display: table-cell;
+        }
+        
+        .elemStruct>.elemHeader>.elemTitle.editable {
+            outline: none;
+            cursor: auto;
+        }
+        
+        .elemStruct>.innerElemTable {
+            display: table;
+            width: 100%;
+        }
+        
+        .elemStruct>.innerElementCell {
+            display: table-cell;
+            background: #ececec;
+        }
+        /* While Loop */
+        
+        .elemStruct0 {}
+        
+        .elemStruct0:not(:first-child) {
+            border-top: 1px solid black;
+        }
+        
+        .elemStruct0>.elemHeader {
+            cursor: pointer;
+            display: table;
+            width: 100%;
+        }
+        
+        .elemStruct0>.elemBottom {
+            padding-bottom: 0.5em;
+            width: 100%;
+        }
+        /* Do While Loop */
+        
+        .elemStruct1:not(:first-child) {
+            border-top: 1px solid black;
+        }
+        
+        .elemStruct1>.elemBottom {
+            display: block;
+            width: 100%;
+        }
+        
+        .elemStruct1>.elemBottom>.elemTitle {
+            padding-top: 0.5em;
+            padding-bottom: 0.5em;
+            margin-left: 2em;
+        }
+        /* For Loop */
+        
+        .elemStruct2 {
+            padding-bottom: 2%;
+        }
+        
+        .elemStruct2>.elemHeader {
+            width: 100%;
+            display: table;
+        }
+        
+        .elemStruct2>.elemBottom {
+            display: table;
+            width: 100%;
+        }
+        /* If Else */
+        
+        .elemStruct3 {
+            width: 100%;
+			min-height: 100% !important;
+        }
+        
+        .elemStruct3:not(:first-child) {
+            border-top: 1px solid black;
+        }
+        
+        .elemStruct3>.elemHeader {
+            width: 100%;
+            height: 3em;
+            text-align: center;
+            position: relative;
+        }
+        
+        .elemStruct3>.elemHeader>.elemTitle {
+            display: inline-block;
+            padding: 0px;
+            padding-top: 1%;
+            position: absolute;
+            z-index: 150;
+        }
+        
+        .elemStruct3>.elemHeader>.line1 {
+            position: absolute;
+            top: 0px;
+            left: 2px;
+            width: 0;
+            height: 0;
+            z-index: 6;
+            border-left: 150px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 60px solid white;
+            transform-origin: 0 0;
+        }
+        
+        .elemStruct3>.elemHeader>.line2 {
+            position: absolute;
+            top: 0px;
+            left: 0;
+            width: 0;
+            height: 0;
+            z-index: 5;
+            border-left: 150px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 60px solid black;
+            transform-origin: 0 0;
+			
+        }
+        
+        .elemStruct3>.elemHeader>.elemTitle {
+            width: 100%;
+            left: 0;
+            top: 0;
+            position: absolute;
+            padding: 0;
+            height: 100%;
+        }
+        
+        .elemStruct3.elemStruct>.elemHeader>.elemTitle:before {
+            content: 'true';
+            position: absolute;
+            bottom: 2%;
+            left: 0.25em;
+        }
+        
+        .elemStruct3>.elemHeader>.elemTitle:after {
+            content: 'false';
+            position: absolute;
+            bottom: 2%;
+            right: 0.25em;
+        }
+        
+        .elemStruct3>.innerElementTable {
+            font-size: 0;
+            width: 100%;
+            min-height: 2.5em;
+            border-top: 1px solid black;
+            flex-wrap: wrap;
+            display: flex;
+			height: 100%;
+        }
+        
+        .elemStruct3>.innerElementTable>.innerElementCell {
+            display: inline-block;
+            width: calc(100% / 2 - 1.5px);
+            min-width: 20px;
+            background-color: #ecf0f1;
+            min-height: 2.5em;
+            cursor: auto;
+            overflow: auto;
+            font-size: 16px;
+            vertical-align: top;
+			
+        }
+        
+        .elemStruct3>.innerElementTable>.innerElementCellSeperator {
+            min-height: 2.5em;
+            cursor: col-resize;
+            display: inline-block;
+            font-size: 16px;
+            vertical-align: top;
+        }
+        
+        .elemStruct3>.innerElementTable>.innerElementCellSeperator>.innerElementCellSeperatorLine {
+            background-color: black;
+            width: 1px;
+            margin: 0 1px 0 1px;
+            height: 100%;
+        }
+		/* Switch */
+		.elemStruct4 {
+			
+		}
+		
+        /* Anweisung */
+        
+        .elemStruct5 {
+            min-height: 2.5em;
+        }
+        
+        .elemStruct5:last-child:not(:first-child) {
+            border-bottom: none;
+        }
+        
+        .elemStruct5:first-child:last-child {
+            border-bottom: none;
+        }
+        
+        .elemStruct5>.elemHeader {}
+        
+        .elemStruct5>.elemHeader>.elemTitle {
+            display: block;
+        }
+        
+        .elemStruct6 {}
+        
+        .elemStruct7 {}
+        
+        .elemStruct7>.elemHeader {
+            width: 100%;
+            flex-wrap: wrap;
+            display: flex;
+        }
+        
+        .elemStruct7 .elemHeader .beforePart {
+            height: 100%;
+            width: 0.5em;
+            border-right: 1px solid black;
+            display: inline-block;
+            vertical-align: top;
+            min-height: 2.2em;
+        }
+        
+        .elemStruct7 .elemHeader .afterPart {
+            height: 100%;
+            width: 0.5em;
+            border-left: 1px solid black;
+            display: inline-block;
+            vertical-align: top;
+            min-height: 2.2em;
+        }
+        
+        .elemStruct7>.elemHeader>.elemTitle {
+            display: inline-block;
+            width: calc(100% - 4em);
+            vertical-align: top;
+        }

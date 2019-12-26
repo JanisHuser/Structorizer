@@ -1,0 +1,950 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <link rel="stylesheet" href="styles/styleElements.css" />
+    <link rel="stylesheet" href="styles/generall.css" />
+    <link rel="stylesheet" href="styles/overview.css" />
+    <link rel="stylesheet" href="styles/documentation.css" />
+    <title>Structorizer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1 user-scalable=0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="script/createElem.js?version=1.0" type="text/javascript"></script>
+    <script src="script/engine.js?version=1.0" type="text/javascript"></script>
+    <script src="script/informationDiv.js" type="text/javascript"></script>
+    <script src="script/createOverview.js" type="text/javascript"></script>
+    <script src="script/historyAPI.js" type="text/javascript"></script>
+    <script src="script/convertStructogram.js" type="text/javascript"></script>
+<link rel="icon" href="favicon.png">
+    <script>
+        var GlobalSettings = {
+            fastEditMode: false
+        }
+        var customId = 1;
+
+
+        var historyLog = [],
+            historyPos = 0;
+
+        $(document).ready(function() {
+
+            
+
+            createNewHistoryLog($(".structTabs .tabItem.active").attr("id"));
+            var elemInformation = {
+                elemNr: null,
+                elemText: null,
+                elemBColor: null
+            };
+            var activeDrag = null;
+
+            $(document).on("dragstart", ".createElem", function(e) {
+                $(this).css("border", "1px dashed grey");
+                elemInformation.elemNr = $(this).attr("elemId");
+            });
+
+            $(document).on("dragend", ".createElem", function(e) {
+                if (!$("#" + activeDrag).hasClass("informationHeader")) {
+                    $(this).css("border", "none").css("border-bottom", "1px solid white");
+                }
+                $(".insertBefore .dropZoneBefore").each(function() {
+                    if ($(this).children().length == 0) {
+                        $(this).parent().remove();
+                    }
+                });
+                $(".insertAfter .dropZoneAfter").each(function() {
+                    if ($(this).children().length == 0) {
+                        $(this).parent().remove();
+                    }
+                });
+
+            });
+
+            $(document).on("dragover", ".innerDroppable, .dropZoneBefore, .dropZoneAfter", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+            });
+            
+
+            $(document).on("dragover", ".elemStruct", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if( !$(this).prev().hasClass("insertAfter") && !$(this).prev().hasClass("insertBefore") && !$(e.target).hasClass("deleteSection")) {
+                    $(this).before($("<div class='insertBefore'></div>"));
+                }
+                if( !$(this).next().hasClass("insertAfter") && !$(this).next().hasClass("insertBefore") && !$(e.target).hasClass("deleteSection")) {
+                    $(this).after($("<div class='insertAfter'></div>"));
+                }
+            });
+
+            $(document).on("dragleave", ".elemStruct", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                //$(".insertBefore").remove();
+                //$(".insertAfter").remove();
+
+            });
+
+
+
+            $(document).on("drop dragend", ".innerDroppable, .insertBefore, .insertAfter", function(e) {
+                
+                if (activeDrag == null) { //create new Element
+                    createElement(this, customId, elemInformation.elemNr);
+                    activeDrag = null;
+                    var obj = {};
+                    obj["type"] = "create";
+                    obj["objectid"] = customId++;
+                    obj["elemType"] = elemInformation.elemNr;
+                    obj["parentElem"] = $(e.target);
+                    historyLog.push(obj);
+                    historyPos++;
+                    if (GlobalSettings.fastEditMode == true) {
+                        $(".elemStruct .elemHeader .elemTitle").addClass("editable").attr("contenteditable", "true");
+                    }
+                    addNewHistoryLog(($(".structTabs .tabItem.active").attr("id")), ($(".elemStruct").length), 0, "", $(this).attr("id"));
+                } else { //element is moved
+                    if($(this).parent().attr("id") != activeDrag ) {
+                    if ($(this).hasClass("insertBefore")) {
+                        $(".mainStruct#mainStruct"+ $(".structTabs .tabItem.active").attr("id") +" #"+ activeDrag).prependTo($(this).parent());
+                        //$("#" + activeDrag).prependTo($(this).parent().children(".innerDroppable"));
+                    } else if ($(this).hasClass("insertAfter")) {
+                        $("#" + activeDrag).appendTo($(this).parent().children(".innerDroppable"));
+                    } else {
+                        $("#" + activeDrag).appendTo(this);
+                    }
+                    }
+                    $(".insertBefore").each(function() {
+                        if ($(this).children().length == 0) {
+                            $(this).remove();
+                        }
+                    });
+                    $(".insertAfter").each(function() {
+                        if ($(this).children().length == 0) {
+                            $(this).remove();
+                        }
+                    });
+                    
+                }
+
+                e.stopPropagation();
+                e.preventDefault();
+
+
+            });
+
+
+            $(document).on("click", ".innerElementCell", function(e) {
+                $(".innerElementCell").trigger("withChange");
+                var nextElemsAmount = $(e.target).parent().children(".innerElementCell").length;
+                var thisWidth = $(e.target).css("width");
+                var maxWidth = $(e.target).parent().css("width");
+                var toSetWidth = parseInt(parseInt(maxWidth - thisWidth) / nextElemsAmount - 1);
+
+                $(this).closest().siblings(".innerElementCell").css("width", parseInt(toSetWidth) + 'px');
+                console.log(parseInt(thisWidth));
+            });
+
+            $(document).on("mousedown", ".innerDroppable", function(e) {
+                if ($(e.target).hasClass("innerDroppable")) {
+                    e.preventDefault();
+                }
+            });
+            $(document).on("dragstart", ".elemStruct", function(e) {
+                activeDrag = $(e.target).attr("id");
+                $(e.target).css({
+                    backgroundColor: "#A4C0D6"
+                });
+                $(".navigation .itemSection,.navigation .itemSectionHeader, .navigation .itemSectionContent").css({
+                    opacity: '0.4'
+                });
+                $(".navigation .deleteSection, .navigation .itemSection.itemSectionBottom").css({
+                    opacity: '1'
+                });
+                e.stopPropagation();
+                
+            });
+
+
+
+            $(document).on("dragover", ".header", function(e) {;
+                e.stopPropagation();
+            });
+            $(document).on("dragleave", ".header", function(e) {
+                e.stopPropagation();
+            });
+
+            $(document).on("drop, dragend", ".elemStruct", function(e) {
+
+                activeDrag = null;
+                $(".elemStruct").css("background-color", "white");
+                $(".navigation .itemSection,.navigation .itemSectionHeader, .navigation .itemSectionContent").css({
+                    opacity: '1'
+                });
+                $(".navigation .deleteSection, .navigation .itemSection.itemSectionBottom").css({
+                    opacity: '1'
+                });
+            });
+
+            $(document).on("drop", ".elemStruct .innerDroppable", function(e) {
+                activeDrag = null;
+            });
+
+
+
+
+            $(document).on("drop", ".deleteSection", function(e) {
+                e.stopPropagation();
+                if (!$("#" + activeDrag).hasClass("informationHeader")) {
+                    $("#" + activeDrag).remove();
+                    $(this).removeClass("onHoverActive");
+                }
+				activeDrag = null;
+                $(".navigation .itemSection,.navigation .itemSectionHeader, .navigation .itemSectionContent").css({
+                    opacity: '1'
+                });
+                $(".navigation .deleteSection, .navigation .itemSection.itemSectionBottom").css({
+                    opacity: '1'
+                });
+
+                $(".insertBefore").each(function() {
+                    if ($(this).children().length == 0) {
+                        $(this).remove();
+                    }
+                });
+                $(".insertAfter").each(function() {
+                    if ($(this).children().length == 0) {
+                        $(this).remove();
+                    }
+                });
+            });
+
+            $(document).on("dragover", ".deleteSection", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).addClass("onHoverActive");
+
+            });
+
+
+            $(document).on("dragleave", ".deleteSection", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).removeClass("onHoverActive");
+            });
+
+
+            $(".itemSave").click(function(e) {
+                $(".saveDialog .saveDialogContent .saveDialogContentCode").text($(".mainStruct")[0].outerHTML);
+                $(".saveDialog").show();
+            });
+            $(document).on("click", ".saveDialog", function(e) {
+                if ($(e.target).hasClass("saveDialog")) {
+                    $(".saveDialog").hide();
+                }
+            });
+            $(document).on("click", ".itemOpen", function(e) {
+
+            });
+
+
+            var template = "<div class='mainStruct'><div class='informationHeader elemHeader' draggable='false' id='elemStruct0' data_title='noTitle' data_elements='0' data_version='0' data_type='Hauptstruktogram' data_description=''>header</div><div class='innerElements innerDroppable'></div></div>";
+
+            $(".dropDownOption").click(function() {
+                if (!$(this).hasClass("inActive")) {
+                    $(".dropDownContent").hide();
+
+                    console.log($(this).attr("id"));
+                    switch ($(this).attr("id")) {
+                        //neue Datei
+                        case "item1":
+                            $(".structContent")[0].innerHTML = template;
+                            break;
+                            //Datei öffnen
+                        case "item2":
+                            $(".openFileDialog").click();
+                            break;
+                            //Speichern
+                        case "item3":
+                            var content = "";
+                            var mainStructs = document.querySelectorAll(".mainStruct");
+                            for(var i=0; i < mainStructs.length; i++) {
+                                content += "mainStructHeaderCompleteLoad:{";
+                                content += mainStructs[i].outerHTML;
+                                content += "}";
+                            }
+
+                            var filename = $(".structTabs .tabItem#0 .text").text() + ".structIo";
+
+                            download(filename, content);
+                            break;
+                            //speicher unter
+                        case "item4":
+
+                            break;
+                        case "viewOverview": //show Overview
+                            overView().createOverview();
+                            break;
+                        case "viewEditMode": //show editMode
+                            $(".structTabs").show().delay(10);
+                            if ($(".navigation").css("marginLeft") == "-250px") {
+
+                                $(".navigation").animate({
+                                    "margin-left": '+=250'
+
+                                }, 250); //show Navigation Menu
+                            }
+                            $(".structContent").show() //show edit mode from diagram
+
+                            $(".mainOverview").remove(); //remove Overview
+                            break;
+                        case "onOffFastEditMode":
+                        if (GlobalSettings.fastEditMode == false) {
+                            $(".elemStruct .elemHeader .elemTitle, .mainStructHeader .title").addClass("editable").attr("contenteditable", "true");
+                            GlobalSettings.fastEditMode = true;
+                            $("#onOffFastEditMode .text").html("Fastedit mode deaktivieren");
+                        } else {
+                            $(".elemStruct .elemHeader .elemTitle, .mainStructHeader .title").removeClass("editable").attr("contenteditable", "false");
+                            GlobalSettings.fastEditMode = false;
+                            $("#onOffFastEditMode .text").html("Fastedit mode aktivieren");
+                        }
+                        break;
+                    }
+                    $(".menuBar .dropDownDiv .titleButton").removeClass("active");
+                }
+            });
+
+
+            $(".openFileDialog").change(function() {
+                var file = document.getElementById("openFileDialog").files[0];
+                var reader = new FileReader();
+                reader.readAsText(file, "UTF-8");
+                reader.onload = function(evt) {
+                    $(".mainStruct")[0].outerHTML = evt.target.result;
+                }
+                reader.onerror = function(evt) {
+                    alert("error");
+                }
+            });
+            $(".structTabs .openNewTab").click(function() {
+                var c1 = $("<div class='text'>unnamed</div>"),
+                    c2 = $("<div class='close'>x</div>"),
+                    elem = $("<div class='tabItem'></div>");
+
+                $(elem).append(c1).append(c2);
+                $(elem).attr("id", $(".tabItem").length);
+
+                createNewDiagram($(".tabItem").length);
+
+                $(".structTabs .openNewTab").before(elem);
+                $(".structTabs .tabItem#" + ($(".tabItem").length - 1)).click();
+            });
+
+            $(document).on("click", ".structTabs .tabItem .close", function(e) {
+                if ($(this).parent().hasClass("active")) {
+                    $(".structTabs .tabItem:nth-child(" + parseInt($(".structTabs .tabItem").index($(this).parent())) + ")").toggleClass("active");
+                }
+                $(this).parent().remove();
+            });
+            $(document).on("click", ".structTabs .tabItem", function(e) {
+                if (!$(e.target).hasClass("close")) {
+                    $(".structTabs .tabItem").removeClass("active");
+                    $(this).addClass("active");
+
+                    $(".structContent .mainStruct").hide();
+                    $(".structContent .mainStruct#mainStruct" + $(this).attr("id")).show();
+                }
+            });
+            $(document).click(function(event) {
+                if (!$(event.target).is(".menuBar, .dropDownDiv, .titleButton, .DropDownContent, .dropDownOption")) {
+
+                    $(".dropDownContent").hide();
+                    $(".menuBar .dropDownDiv .titleButton").removeClass("active");
+                }
+            });
+            $(".navigation .item .itemHeader").click(function() {
+                if ($(this).parent().hasClass("expanded")) {
+                    $(".navigation .item .dropDownDiv").slideUp(250);
+                    $(".navigation .item").removeClass("expanded");
+                } else {
+                    $(".navigation .item").removeClass("expanded");
+                    $(this).parent().addClass("expanded");
+                    $(this).parent().children(".dropDownDiv").slideToggle(250);
+                }
+            });
+            $(document).on("click", ".mainStruct", function(e) {
+
+            });
+            var keyPressed = {};
+
+            document.addEventListener('keydown', function(e) {
+                keyPressed[e.keyCode] = true;
+            }, false);
+            document.addEventListener('keyup', function(e) {
+                keyPressed[e.keyCode] = false;
+            }, false);
+
+            document.onkeydown = function (e) {
+            e = e || window.event;//Get event
+                if (e.ctrlKey) {
+                    var c = e.which || e.keyCode;//Get key code
+                    switch (c) {
+                        case 83://Block Ctrl+S
+                            e.preventDefault();     
+                            e.stopPropagation();
+                        break;
+                        case 87://Block Ctrl+W --Not work in Chrome
+                            e.preventDefault();     
+                            e.stopPropagation();
+                        break;
+                        case 65://mark all
+                            $(".mainStruct#mainStruct" + $(".structTabs .tabItem.active").attr("id") + " .elemStruct").each(function() {
+                                $(this).addClass("selectedActive");
+                            });
+                            e.preventDefault();     
+                            e.stopPropagation();
+                        break;
+                        case 73://fast mode
+                                if (GlobalSettings.fastEditMode == false) {
+                                    $(".elemStruct .elemHeader .elemTitle, .mainStruct .mainStructHeader .title").addClass("editable").attr("contenteditable", "true");
+                                    GlobalSettings.fastEditMode = true;
+                                } else {
+                                    $(".elemStruct .elemHeader .elemTitle, .mainStruct .mainStructHeader .title").removeClass("editable").attr("contenteditable", "false");
+                                    GlobalSettings.fastEditMode = false;
+                                }
+                            e.preventDefault();     
+                            e.stopPropagation();
+                        break;
+                        case 88://cut
+
+                        break;
+                        case 67://copy
+
+                        break;
+                        case 86://paste
+
+                        break;
+                    }
+                }
+            };
+            $(document).on("keydown", function(e) {
+                console.log(e.keyCode);
+                //go back
+                if (keyPressed[17] && keyPressed[90]) {
+                    goHistoryBack($(".structTabs .tabItem.active").attr("id"));
+                }
+                //go Forward
+                if (keyPressed[17] && keyPressed[89]) {
+                    goHistoryForward($(".structTabs .tabItem.active").attr("id"));
+                }
+            });
+            /* setInterval(function() {
+                 //go Back Button
+                 if (historyPos > 0) {
+                     $(".menuBar .dropDownDiv .dropDownContent .dropDownOption#goBack").removeClass("inActive");
+                 } else {
+                     $(".menuBar .dropDownDiv .dropDownContent .dropDownOption#goBack").addClass("inActive");
+                 }
+                 //go Forward Button
+             }, 500);*/
+
+
+            $(document).on("click", ".elemStruct", function(e) {
+                if (keyPressed[17]) {
+
+                    $(this).toggleClass("selectedActive");
+                }
+            });
+            $(document).on("click", ".menuBar .dropDownDiv .titleButton", function() {
+                if (!$(this).hasClass("active")) {
+                    $(".menuBar .dropDownDiv .titleButton").removeClass("active");
+                    $(this).addClass("active");
+                    $(".menuBar .dropDownDiv .dropDownContent").hide();
+                    $(this).parent().children(".dropDownContent").show();
+
+                } else {
+                    $(".menuBar .dropDownDiv .titleButton").removeClass("active");
+                    $(this).parent().children(".dropDownContent").toggle();
+                }
+            });
+
+            $(document).on("drop", ".innerDroppable", function(e) {});
+
+
+            $(document).on("click", ".informationDiv .informationContent .characteristicsDiv .header", function(e) {
+                if ($(this).parent().hasClass("expand")) {
+                    $(".informationDiv .informationContent .characteristicsDiv .characteristicsDivContent").slideUp(100);
+                    $(".informationDiv .informationContent .characteristicsDiv").removeClass("expand");
+                } else {
+                    $(".informationDiv .informationContent .characteristicsDiv").removeClass("expand");
+                    $(".informationDiv .informationContent .characteristicsDiv .characteristicsDivContent").slideUp(100);
+                    $(this).parent().children(".characteristicsDivContent").slideDown(100);
+                    $(this).parent().addClass("expand");
+                }
+                e.stopPropagation();
+            });
+
+            $(".navigation .navigationToggle").click(function() {
+                if ($(".navigation").hasClass("slideToggle")) {
+                    $(".navigation").removeClass("slideToggle").animate({
+                        "width": "250px"
+                    }, 250).attr("title", "Menu verkleinern");
+                } else {
+                    $(".navigation").addClass("slideToggle").animate({
+                        "width": "60px"
+                    }, 250).attr("title", "Menu vergrössern");
+                }
+
+            });
+
+            $(document).on("keydown, keyup", ".elemStruct .elemHeader .elemTitle", function(e) {
+                $(this).parent().parent().attr("data_title", $(this).html());
+                e.stopPropagation();
+                e.preventDefault();
+            });
+             $(document).on("keydown, keyup", ".mainStruct .mainStructHeader .title", function(e) {
+                $(".structTabs .tabItem.active .text").html($(this).html());
+				$(this).parent().parent().attr("data_title", $(this).html());
+                e.stopPropagation();
+                e.preventDefault();
+            });
+			
+			$(document).on("click", ".customDropDown .customDropDownTitle", function(e) {
+				$(this).parent().children(".customDropDownContent").toggle();
+				$(this).toggleClass("active");
+			});
+			$(document).on("click", ".customDropDown .customDropDownContent .item", function(e) {
+				var value = $(this).html();
+				$(this).parent().parent().children(".customDropDownTitle").children(".text").html(value);
+				$(this).parent().hide();
+				$(this).parent().parent().children(".customDropDownTitle").removeClass("active");
+				e.stopPropagation();
+			});
+            if( window.location.href.indexOf("#fileContext=") !== -1 ) {
+                var split1 = window.location.href.split("#fileContext=");
+                var split2 = split1[1].split("fileType=");
+                var fileContext = split2[0];
+                var fileType = split2[1];
+                openStructogramm(fileContext, fileType);
+
+                history.pushState(null, '', 'struct2.html');
+            }
+            
+
+            if (navigator.appName == 'Microsoft Internet Explorer') {
+                $(".browserBlock").show();
+            } else {
+                $(".browserBlock").hide();
+            }
+			document.addEventListener('contextmenu', function(ev) {
+				ev.preventDefault();
+				return false;
+			}, false);
+			$(document).on("mousedown mouseup mousemove", function(e) {
+				if (window.getSelection) {
+					window.getSelection().removeAllRanges();
+				} else if (document.selection) {
+					document.selection.empty();
+				}
+			});
+			
+        });
+        document.addEventListener("DOMContentLoaded", function(e) {
+            /* seperator actions */
+            var mouseDownOnSeperator = false,
+                elemStructSeperatorParentWidth = 0,
+                elemStructElement = null;
+
+            $(document).on("mousedown", ".innerElementCellSeperator", function(e) {
+                mouseDownOnSeperator = true;
+                elemStructSeperatorParentWidth = window.getComputedStyle(e.target.parentNode.parentNode, null).getPropertyValue("width");
+                elemStructElement = this;
+
+                e.stopPropagation();
+                e.preventDefault();
+            });
+
+
+            engine().customListenerClasses("mousemove", "", function(e) {
+
+                if (mouseDownOnSeperator == true) {
+                    var mainStructOffsetLeft = document.querySelectorAll(".structContent .mainStruct")[0].offsetLeft + document.querySelectorAll(".structContent .mainStruct .dropZone")[0].offsetLeft;
+                    /* move seperator line */
+                    var parentElemWidth = parseInt(window.getComputedStyle(elemStructElement.parentNode, null).getPropertyValue("width")); //100%
+                    var widthPercentage1 = ((e.pageX - mainStructOffsetLeft) / parseInt(window.getComputedStyle(elemStructElement.parentNode, null).getPropertyValue("width")) * 100);
+
+                    var line1Elem = elemStructElement.parentNode.parentNode.childNodes[0].childNodes[0],
+                        line2Elem = elemStructElement.parentNode.parentNode.childNodes[0].childNodes[2];
+
+                    if(widthPercentage1 > 4 && widthPercentage1 < 96 ) { 
+                    line1Elem.style.borderLeft = (e.pageX - mainStructOffsetLeft) + "px solid transparent";
+                    line1Elem.style.borderRight = (parseInt($(elemStructElement.parentNode.parentNode.childNodes[0]).css("width")) - 4 - (e.pageX - mainStructOffsetLeft)) + "px solid transparent";
+                    line1Elem.style.borderTop = (parseInt($(elemStructElement.parentNode.parentNode.childNodes[0]).css("height"))) - 1.5 + "px solid white";
+                    
+
+
+                    line2Elem.style.borderLeft = (e.pageX - mainStructOffsetLeft) + "px solid transparent";
+                    line2Elem.style.borderRight = (parseInt($(elemStructElement.parentNode.parentNode.childNodes[0]).css("width")) - (e.pageX - mainStructOffsetLeft)) + "px solid transparent";
+                    line2Elem.style.borderTop = (parseInt($(elemStructElement.parentNode.parentNode.childNodes[0]).css("height")))  + "px solid black";
+
+
+                    elemStructElement.parentNode.childNodes[0].style.width = "calc(" + widthPercentage1 + "% - 1.5px)";
+                    elemStructElement.parentNode.childNodes[2].style.width = "calc(100% - " + widthPercentage1 + "% - 1.5px)";
+                    }
+                    e.preventDefault();
+					
+					$(elemStructElement).parent().find(".elemStruct3").each(function(e) {
+						var parentElemWidthC = parseInt($(this).children(".elemHeader").css("width")),
+							parentElemHeightC = parseInt($(this).children(".elemHeader").css("height")),
+							children1ElemWidth = parseInt($(this).children(".innerElementTable").children(".innerElementCell").first().css("width")),
+							children2ElemWidth = parseInt($(this).children(".innerElementTable").children(".innerElementCell:nth-child(2)").css("width"));
+							
+						$(this).children(".elemHeader").children(".line1").css({
+							borderLeft: children1ElemWidth  + "px solid transparent",
+							borderRight: (parentElemWidthC - 2 - children1ElemWidth) + "px solid transparent",
+							borderTop: parentElemHeightC -1.5+ "px solid white"
+						});
+						$(this).children(".elemHeader").children(".line2").css({
+							borderLeft: children1ElemWidth  + "px solid transparent",
+							borderRight: (parentElemWidthC - 2 - children1ElemWidth) + "px solid transparent",
+							borderTop: parentElemHeightC + "px solid black"
+						});
+					});
+                }
+            });
+            engine().customListenerClasses("mouseup", "", function(e) {
+                mouseDownOnSeperator = false;
+            });
+        });
+
+        function createNewDiagram(id) {
+            var mainStruct = $("<div class='mainStruct' id='mainStruct" + id + "'></div>"),
+                mainStructHeader = $("<div class='mainStructHeader'><div class='title'>Titel</div></div>"),
+                dropZone = $("<div class='dropZone innerDroppable'></div>"),
+                mainStructBottom = $("<div class='mainStructBottom'></div>");
+
+            $(mainStruct).append(mainStructHeader).append(dropZone).append(mainStructBottom);
+
+
+            $(".structContent .mainStruct").hide();
+            $(".structContent").append(mainStruct);
+        }
+
+
+        function onBeforeUnloadEvent() {
+            return "alert('Wollen Sie die Seite ohne speichern verlassen?')";
+        }
+
+        function download(filename, text) {
+
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+            element.setAttribute('download', filename);
+
+            element.style.display = 'none';
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
+        }
+    </script>
+</head>
+
+<!--<body onbeforeunload="return onBeforeUnloadEvent()">-->
+
+<body>
+    <div class="menuBar">
+        <div class="dropDownDiv">
+            <div class="titleButton" id="menuBarItem1">Datei</div>
+            <div class="dropDownContent" id="menuBarDropDownContent1">
+                <div class="dropDownOption" id="item1">
+                    <div class="text">Neues Projekt</div>
+                    <div class="shortCut">Ctrl + N</div>
+                </div>
+                <div class="dropDownOption" id="item2">
+                    <div class="text">Projekt/Datei &ouml;ffnen</div>
+                    <div class="shortCut">Ctrl + Shift + N</div>
+                </div>
+                <div class="dropDownSeperator"></div>
+                <div class="dropDownOption" id="item3">
+                    <div class="text">Download</div>
+                    <div class="shortCut">Ctrl + S</div>
+                </div>
+                <div class="dropDownSeperator" id="item5"></div>
+                <div class="dropDownOption" id="item6">
+                    <div class="text">Einstellungen</div>
+                    <div class="shortCut">Ctrl + Comma</div>
+                </div>
+                <div class="dropDownSeperator"></div>
+                <div class="dropDownOption" id="item7">Fenster schliessen</div>
+            </div>
+        </div>
+        <div class="dropDownDiv">
+            <div class="titleButton" id="menuBarItem2">Bearbeiten</div>
+            <div class="dropDownContent" id="menuBarDropDownContent2">
+                <div class="dropDownOption" id="goBack">
+                    <div class="text">R&uuml;ckg&auml;ngig</div>
+                    <div class="shortCut">Ctrl + Z</div>
+                </div>
+                <div class="dropDownOption" id="goForward">
+                    <div class="text">Wiederholen</div>
+                    <div class="shortCut">Ctrl + Y</div>
+                </div>
+                <div class="dropDownSeperator"></div>
+                <div class="dropDownOption">
+                    <div class="text">Ausschneiden</div>
+                    <div class="shortCut">Ctrl + X</div>
+                </div>
+                <div class="dropDownOption">
+                    <div class="text">Kopieren</div>
+                    <div class="shortCut">Ctrl + C</div>
+                </div>
+                <div class="dropDownOption">
+                    <div class="text">Einfügen</div>
+                    <div class="shortCut">Ctrl + V</div>
+                </div>
+                <div class="dropDownOption" id="onOffFastEditMode">
+                    <div class="text">Fastedit Mode aktivieren</div>
+                    <div class="shortCut">Ctrl + I</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dropDownDiv">
+            <div class="titleButton" id="menuBarItem1">Ansicht</div>
+            <div class="dropDownContent" id="menuBarDropDownContent4">
+                <div class="dropDownOption" id="viewEditMode">Bearbeitungsmodus</div>
+                <div class="dropDownOption" id="viewOverview">&Uuml;bersicht aller Diagramme</div>
+
+            </div>
+        </div>
+        <div class="dropDownDiv">
+            <div class="titleButton" id="menuBarItem3">Hilfe</div>
+            <div class="dropDownContent" id="menuBarDropDownContent3">
+                <div class="dropDownOption">Willkommen</div>
+                <div class="dropDownOption">Dokumentation</div>
+                <div class="dropDownSeperator"></div>
+                <div class="dropDownOption">Info</div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+    <div class="structTabs">
+        <div class="tabItem active" id="0">
+            <div class="text">Hauptstruktogram</div>
+            <div class="close" style="display: none;">x</div>
+        </div>
+        <div class="openNewTab">
+            <div class="text">+</div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <div class="itemSection">
+            <div class="itemSectionHeader">
+                <div class="title">Schleifen</div>
+            </div>
+            <div class="itemSectionContent">
+                <div class="item createElem" id="elem0" draggable="true" elemId="0">
+                    <div class="text">While-Schlaufe</div>
+                </div>
+                <div class="item createElem" id="elem1" draggable="true" elemId="1">
+                    <div class="text">DoWhile-Schlaufe</div>
+                </div>
+                <div class="item createElem" id="elem2" draggable="true" elemId="2">
+                    <div class="text">For-Schlaufe</div>
+                </div>
+            </div>
+        </div>
+        <div class="itemSection">
+            <div class="itemSectionHeader">
+                <div class="title">Decisions</div>
+            </div>
+            <div class="itemSectionContent">
+                <div class="item createElem" id="elem3" draggable="true" elemId="3">
+                    <div class="text">If-Abfrage</div>
+                </div>
+                <div class="item createElem" id="elem4" draggable="true" elemId="4">
+                    <div class="text">Switch</div>
+                </div>
+            </div>
+        </div>
+        <div class="itemSection">
+            <div class="itemSectionHeader">
+                <div class="title">Weitere Elemente</div>
+            </div>
+            <div class="itemSectionContent">
+                <div class="item createElem" id="elem5" draggable="true" elemId="5">
+                    <div class="text">Anweisung</div>
+                </div>
+                <div class="item createElem" id="elem6" draggable="true" elemId="6">
+                    <div class="text">Define</div>
+                </div>
+
+                <div class="item createElem" id="elem7" draggable="true" elemId="7">
+                    <div class="text">Funktion</div>
+                </div>
+            </div>
+        </div>
+        <div class="itemSection itemSectionBottom" style="border-top: 1px solid black;">
+            <div class="itemSectionHeader">
+                <div class="title">Tools</div>
+            </div>
+            <div class="itemSectionContent">
+                <div class="item selectColor">
+                    <div class="color"></div>
+                    <div class="color"></div>
+                    <div class="color"></div>
+                    <div class="color"></div>
+                    <div class="color"></div>
+                    <div class="color"></div>
+                </div>
+            </div>
+            <div class="deleteSection">
+                <div class="text">Element l&ouml;schen</div>
+            </div>
+        </div>
+        <div class="navigationToggle">
+            <div class="text">Menu verkleinern</div>
+            <div class="symbole">&#9664;</div>
+        </div>
+    </div>
+    <div class="structContent">
+        <div class="mainStruct" id="mainStruct0">
+            <div class="mainStructHeader">
+                <div class="title">title</div>
+            </div>
+            <div class="dropZone innerDroppable"></div>
+            <div class="mainStructBottom"></div>
+        </div>
+    </div>
+
+    <!-- menu Bar Divs and Items to open -->
+    <input type="file" class="openFileDialog" id="openFileDialog" style="display: none;" accept=".structIo,.7, .nsd" />
+    <div class="settingsDiv">
+    </div>
+    <div class="informationDiv">
+        <div class="information_content">
+            <div class="informationHeader">
+                <div class="itemInformationType">Type </div>
+            </div>
+            <div class="informationContent">
+                <!-- Title -->
+                <div class="singleDiv">
+                    <div class="smallTitle">Titel:</div>
+                    <input type="text" class="customInput informationContentTitle" placeholder="anzuzeigender Text" />
+                </div>
+                <div class="singleDiv" style="height: 25%;">
+                    <div class="smallTitle">Kommentar:</div>
+                    <textarea class="customTextArea informationContentDescription" rows="9"></textarea>
+                </div>
+                <div class="customSettings">
+
+                </div>
+				<!-- settings while loop -->
+				<div class="singleDivContent singleDivContent0">
+					<div class="characteristicsDiv">
+                    <div class="header">
+                        <div class="title">Einstellungen für die Simulation:</div>
+                        <div class="expand"></div>
+                    </div>
+                    <div class="characteristicsDivContent">
+                        <div class="singleCharacteristics">
+                            <div class="settingsLabel">solange:</div>
+							<div class="customDropDown">
+								<div class="customDropDownTitle">
+									<div class="text">title</div>
+									<div class="expand"></div>
+								</div>
+								<div class="customDropDownContent">
+									<div class="item">
+										<div class="text">a</div>
+									</div>
+									<div class="item">
+										<div class="text">a</div>
+									</div>
+									<div class="item">
+										<div class="text">a</div>
+									</div>
+									<div class="item">
+										<div class="text">a</div>
+									</div>
+									<div class="item">
+										<div class="text">a</div>
+									</div>
+								</div>
+							</div>
+                        </div>
+                    </div>
+                </div>
+				</div>
+				<!--
+				<div class="characteristicsDiv">
+                    <div class="header">
+                        <div class="title">Einstellungen für die Simulation:</div>
+                        <div class="expand"></div>
+                    </div>
+                    <div class="characteristicsDivContent">
+                        <div class="singleCharacteristics varName">
+                            <div class="contentLabel">solange:</div>
+                            <input type="text" />
+                            <div class="state" data_description="Variable konnte gefunden werden.">&#10004;</div>
+                            <label for="internalVariable" class="internalVariable">
+							<input id="internalVariable" type="checkbox" />Variable ist nur hier aktiv.
+							</label>
+                        </div>
+                        <div class="singleCharacteristics">
+                            <div class="contentLabel">Variablenname:</div>
+                            <input type="text" />
+                            <div class="state found" data_description="Variable konnte gefunden werden.">&#10004;</div>
+                            <label for="internalVariable" class="internalVariable">
+							<input id="internalVariable" type="checkbox" />Variable ist nur hier aktiv.
+							</label>
+                        </div>
+                    </div>
+                </div>
+				-->
+				
+                <div class="characteristicsDiv">
+                    <div class="header">
+                        <div class="title">Eigenschaften</div>
+                        <div class="expand"></div>
+                    </div>
+                    <div class="characteristicsDivContent">
+                        asdf
+                    </div>
+                </div>
+                
+            </div>
+            <div class="informationLogic">
+                <div class="okButton">
+                    <div class="text">OK</div>
+                </div>
+                <div class="abbortButton">
+                    <div class="text">Abbrechen</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="browserBlock">
+        <div class="description">Es tut uns leid, dein aktueller Browser wird von dieser Plattform nicht unterstützt.</div>
+        <div class="tryOut">
+            <div class="title">Um die Plattform nutzen zu k&ouml;nnen bitten wir dich einen der folgenden Browser zu nutzen:</div>
+            <ul>
+                <li>Google Chrome</li>
+                <li>Mozilla Firefox</li>
+                <li>Opera</li>
+                <li>Microsoft Edge</li>
+            </ul>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

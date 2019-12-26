@@ -1,0 +1,893 @@
+ body {
+     font-family: Verdana;
+     margin: 0 auto;
+ }
+
+ /* menuBar */
+ 
+ .menuBar {
+     background-color: #f0f0f0;
+     display: table;
+     font-size: 90%;
+     width: 100%;
+ }
+ 
+ .menuBar .dropDownDiv {
+     display: inline-block;
+ }
+ 
+ .menuBar .dropDownDiv .titleButton {
+     transition: all 0.25s ease-in-out;
+     cursor: pointer;
+     padding: 0.25em 0.5em 0.25em 0.5em;
+     text-align: center;
+ }
+ 
+ .menuBar .dropDownDiv .titleButton:hover,
+ .menuBar .dropDownDiv .titleButton.active {
+     background-color: #cccccc;
+ }
+ 
+ .menuBar .dropDownDiv .dropDownContent {
+     position: absolute;
+     z-index: 1;
+     background-color: white;
+     min-width: 24.5em;
+     display: none;
+     box-shadow: 2px 2px 2px #666666;
+     font-size: 92.5%;
+     padding-top: 0.25em;
+     padding-bottom: 0.25em;
+ }
+ 
+ .menuBar .dropDownDiv .dropDownContent .dropDownOption {
+     padding: 0.25em;
+     cursor: pointer;
+     padding-left: 2.5em;
+ }
+ 
+ .menuBar .dropDownDiv .dropDownContent .dropDownOption:hover {
+     background-color: #cccccc;
+ }
+ 
+ .menuBar .dropDownDiv .dropDownContent .dropDownOption .text {
+     display: inline-block;
+ }
+ 
+ .menuBar .dropDownDiv .dropDownContent .dropDownOption .shortCut {
+     display: inline-block;
+     padding-right: 0.8em;
+     color: #cccccc;
+     right: 1em;
+     position: absolute;
+     font-size: 90%;
+ }
+ 
+ .menuBar .dropDownDiv .dropDownContent .dropDownOption:hover .shortCut {
+     color: black;
+ }
+ 
+ .menuBar .dropDownDiv .dropDownContent .dropDownSeperator {
+     width: 100%;
+     height: 1px;
+     margin-top: 0.2em;
+     margin-bottom: 0.2em;
+     background-color: #dbdbdb;
+ }
+ 
+ .toolbar {
+     color: #011F4B;
+     border-right: 1px solid #011F4B;
+     width: 15%;
+     display: table-cell;
+ }
+ 
+ .toolbar .itemSection .title {
+     color: #011F4B;
+     padding: 1.5%;
+     font-weight: 700;
+     border-bottom: 1px solid #011F4B;
+ }
+ 
+ .toolbar .itemSection .item {
+     cursor: pointer;
+     transition: all 0.25s ease-in-out;
+     padding: 2%;
+     border-bottom: 1px solid #011F4B;
+     background-color: white;
+ }
+ 
+ .toolbar .itemSection .item:hover {
+     background-color: rgba(0, 0, 0, 0.1);
+ }
+ 
+ .toolbar .deleteSection {
+     margin: 0 auto;
+     margin-top: 5%;
+     cursor: pointer;
+     transition: all 0.25s ease-in-out;
+     border-bottom: 1px solid #011F4B;
+ }
+ 
+ .toolbar .deleteSection svg {
+     margin-left: 25%;
+ }
+ 
+ .toolbar .deleteSection svg g g {
+     transition: all 0.25s ease-in-out;
+ }
+ 
+ .toolbar .deleteSection:hover svg g g,
+ .toolbar .deleteSection.onHoverActive svg g g {
+     fill: #D9534F;
+ }
+ 
+ .toolbar .itemSave {
+     cursor: pointer;
+     transition: all 0.25s ease-in-out;
+     padding: 2%;
+ }
+ 
+ .toolbar .itemSave:hover {
+     background-color: rgba(0, 0, 0, 0.1);
+ }
+ 
+ .content {
+     display: table-cell;
+     overflow-y: scroll;
+ }
+ /* information Change Div */
+ 
+ .informationDiv {
+     position: fixed;
+     z-index: 150;
+     background-color: rgba(255, 255, 255, 0.75);
+     top: 0;
+     left: 0;
+     height: 100%;
+     width: 100%;
+     display: none;
+ }
+ 
+ .informationDiv .information_content {
+     width: 75%;
+     height: 80%;
+     margin: 0 auto;
+     margin-top: 5%;
+     box-shadow: 2px 2px 2px #5b5b5b;
+     background-color: white;
+ }
+ 
+ .informationDiv .informationHeader {
+     font-size: 100%;
+     width: 100%;
+     margin: 0 auto;
+     background-color: #088DA5;
+ }
+ 
+ .informationDiv .informationHeader .itemInformationType {
+     display: inline-block;
+     padding: 1%;
+     text-align: center;
+ }
+ 
+ .informationDiv .informationContent {
+     width: 99%;
+     height: 86%;
+     background-color: white;
+     margin: 0 auto;
+ }
+ 
+ .informationDiv .information_content .singleDiv {
+     position: relative;
+     margin-top: 1%;
+ }
+ 
+ .informationDiv .information_content .smallTitle {
+     font-size: 100%;
+     color: #242424;
+     padding-left: 1%;
+     display: inline-block;
+     padding: 0.5em;
+ }
+ 
+ .informationDiv .information_content .singleDiv .customInput {
+     border: none;
+     border-bottom: 1px solid #cccccc;
+     outline: none;
+     font-size: 100%;
+     padding: 0.5em;
+     width: 80%;
+     display: inline-block;
+     position: absolute;
+     right: 0.5%;
+ }
+ 
+ .informationDiv .information_content .singleDiv .customInput:focus {
+     border-bottom: 1px solid #088DA5;
+ }
+ 
+ .informationDiv .information_content .singleDiv .customTextArea {
+     resize: none;
+     outline: none;
+     border: 1px solid #cccccc;
+     display: inline-block;
+     font-size: 100%;
+     width: 80%;
+     position: absolute;
+     right: 0.5%;
+     padding: 0.5em;
+ }
+ 
+ .informationDiv .information_content .singleDiv .customTextArea:focus {
+     border: 1px solid #088DA5;
+ }
+ /* TITLE */
+ 
+ .informationDiv .information_content .informationLogic {
+     float: right;
+     margin-right: 2.5%;
+ }
+ 
+ .informationDiv .information_content .informationLogic .abbortButton {
+     display: inline-block;
+     box-shadow: 2px 2px 2px #cccccc;
+     width: 8em;
+     padding: 0.5em;
+     cursor: pointer;
+     background-color: #e2e2e2;
+     border-radius: 2px;
+ }
+ 
+ .informationDiv .information_content .informationLogic .abbortButton .text {
+     text-align: center;
+ }
+ 
+ .informationDiv .information_content .informationLogic .okButton {
+     display: inline-block;
+     box-shadow: 2px 2px 2px #cccccc;
+     width: 8em;
+     padding: 0.5em;
+     cursor: pointer;
+     background-color: #e2e2e2;
+     border-radius: 2px;
+ }
+ 
+ .informationDiv .information_content .informationLogic .okButton .text {
+     text-align: center;
+ }
+ 
+ .informationDiv .information_content .informationLogic .okButton:active,
+ .informationDiv .information_content .informationLogic .abbortButton:active {
+     background-color: #bebebe;
+ }
+ 
+ .informationDiv .informationContent .titleInformation {
+     display: table;
+     width: 100%;
+     margin-top: 1%;
+ }
+ 
+ .informationDiv .informationContent .titleInformation .informationLabel {
+     display: table-cell;
+     width: 12%;
+     vertical-align: center;
+ }
+ 
+ .informationDiv .informationContent .titleInformation .informationTitle {
+     border: 1px solid #005B96;
+     padding: 0.75%;
+     outline: none;
+     border-radius: 4px;
+     display: table-cell;
+     vertical-align: center;
+     white-space: nowrap;
+     overflow: hidden;
+     clear: both;
+ }
+ /* DESCRIPTION */
+ 
+ .informationDiv .informationContent .descriptionInformation {
+     display: table;
+     width: 100%;
+     margin-top: 1%;
+ }
+ 
+ .informationDiv .informationContent .descriptionInformation .informationLabel {
+     display: table-cell;
+     width: 12%;
+     vertical-align: center;
+ }
+ 
+ .informationDiv .informationContent .descriptionInformation .informationDescription {
+     border: 1px solid #005B96;
+     padding: 0.75%;
+     outline: none;
+     border-radius: 4px;
+     display: table-cell;
+     vertical-align: center;
+     height: 8em;
+ }
+ 
+ .informationDiv .informationContent .characteristicsDiv {
+     border-top: 1px solid #cccccc;
+     width: 45%;
+ }
+ 
+ .informationDiv .informationContent .characteristicsDiv .header {
+     background-color: white;
+     color: black;
+     display: table;
+     width: 100%;
+     cursor: pointer;
+ }
+ 
+ .informationDiv .informationContent .characteristicsDiv .header:hover,
+ .informationDiv .informationContent .characteristicsDiv.expanded .header {
+     background-color: #f7f7f7;
+ }
+ 
+ .informationDiv .informationContent .characteristicsDiv .header .title {
+     display: table-cell;
+     vertical-align: middle;
+     text-align: left;
+     padding-left: 0.5em;
+     padding-top: 0.5em;
+      padding-bottom: 0.5em;
+ }
+  .informationDiv .informationContent .characteristicsDiv .header .expand {
+      position: relative;
+      display: table-cell;
+      padding-top: 0.5em;
+      padding-bottom: 0.5em;
+  }
+ .informationDiv .informationContent .characteristicsDiv .header .expand:after {
+
+     content: "";
+    position: absolute;
+    right: 10px;
+    top: 14px;
+	width: 0; 
+	height: 0; 
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
+	border-top: 10px solid #333;
+ }
+
+
+ 
+ .informationDiv .informationContent .characteristicsDiv .characteristicsDivContent {
+     display: none;
+ }
+ 
+ .informationDiv .informationContent .characteristicsDiv .characteristicsDivContent .singleCharacteristics {
+     height: auto;
+ }
+ 
+ .informationDiv .informationContent .characteristicsDiv .characteristicsDivContent .singleCharacteristics .contentLabel {
+     color: #b7b7b7;
+     display: inline-block;
+     width: 55%;
+     padding: 0.25em;
+     padding-left: 0.5em;
+ }
+ 
+ .informationDiv .informationContent .characteristicsDiv .characteristicsDivContent .singleCharacteristics input {
+     border: none;
+     outline: none;
+     font-size: 90%;
+     border-bottom: 1px solid #cccccc;
+     padding: 0.25em;
+     width: 32.5%;
+     display: inline-block;
+ }
+ 
+ .informationDiv .informationContent .characteristicsDiv .characteristicsDivContent .singleCharacteristics input:focus {
+     border-bottom: 1px solid #E8702A;
+ }
+ 
+ .informationDiv .informationContent .characteristicsDiv .characteristicsDivContent .singleCharacteristics .state {
+     display: inline-block;
+     width: 1.5em;
+     height: 1.5em;
+     text-align: center;
+     font-weight: 700;
+     color: white;
+ }
+ 
+ .informationDiv .informationContent .characteristicsDiv .characteristicsDivContent .singleCharacteristics .state.found {
+     background-color: #5CB85C;
+ }
+ 
+ .informationDiv .informationContent .characteristicsDiv .characteristicsDivContent .singleCharacteristics .state.error {
+     background-color: #D9534F;
+ }
+ 
+ .informationDiv .informationContent .characteristicsDiv .characteristicsDivContent .singleCharacteristics .internalVariable {
+     width: 98%;
+     margin-left: 1%;
+ }
+ 
+ .informationDiv .informationContent .characteristicsDiv .characteristicsDivContent .singleCharacteristics .internalVariable label {
+     text-align: left;
+ }
+ 
+ .informationDiv .informationContent .characteristicsDiv .characteristicsDivContent .singleCharacteristics .internalVariable input {
+     width: 12px;
+     margin-right: 1.5em;
+ }
+ 
+ .structTabs {
+     overflow: hidden;
+     overflow-x: scroll;
+     width: 100%;
+     height: 37.8px;
+     background-color: #f7f7f7;
+     white-space: nowrap;
+ }
+ 
+ .structTabs::-webkit-scrollbar-track {
+     background-color: #f7f7f7;
+ }
+ 
+ .structTabs::-webkit-scrollbar {
+     height: 6px;
+     background-color: black;
+ }
+ 
+ .structTabs::-webkit-scrollbar-thumb {
+     background-color: black;
+ }
+ 
+ .structTabs .tabItem {
+     display: inline-table;
+     cursor: pointer;
+     background-color: #e5e5e5;
+     font-size: 90%;
+     padding: 0.5em;
+     margin-left: 0.2em;
+ }
+ 
+ .structTabs .tabItem .text {
+     display: table-cell;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     width: 6em;
+     padding: 0.25em;
+ }
+ 
+ .structTabs .tabItem .close {
+     display: table-cell;
+     padding: 0.25em;
+     vertical-align: middle;
+     font-weight: 700;
+     opacity: 0;
+ }
+ 
+ .structTabs .tabItem.active {
+     color: black;
+     background-color: white;
+ }
+ 
+ .structTabs .tabItem:hover .close {
+     opacity: 1;
+ }
+ 
+ .structTabs .openNewTab {
+     cursor: pointer;
+     background-color: #e5e5e5;
+     margin-left: 0.2em;
+     padding: 0.5em;
+     display: inline-table;
+     font-size: 90%;
+ }
+ 
+ .structTabs .openNewTab .text {
+     padding: 0.25em;
+     display: table-cell;
+ }
+ 
+ .structTabs .openNewTab:hover {
+     background-color: #cccccc;
+ }
+ 
+ .innerDroppable.onHoverActive {
+     border: 2px dashed grey;
+ }
+ 
+ .insertBefore {
+     height: 1em;
+     background-color: red;
+ }
+ 
+ .insertAfter {
+     height: 1em;
+     background-color: red;
+ }
+ /* Menu bar divs and items */
+ 
+ .navigation {
+     height: calc(100% - 4.25em);
+     width: 250px;
+     float: left;
+     border-right: 1px solid black;
+     position: relative;
+     background-color: #323232;
+ }
+ 
+ .navigation .itemSectionBottom {
+     bottom: 58px;
+     position: absolute;
+     width: 100%;
+ }
+ 
+ .navigation .itemSectionHeader {
+     display: table;
+     width: 100%;
+     border-bottom: 1px solid white;
+     cursor: pointer;
+     color: white;
+     background-color: #4c4c4c;
+ }
+ 
+ .navigation .itemSectionHeader .title {
+     display: table-cell;
+     padding: 0.4em;
+ }
+ 
+ .navigation .itemSectionContent {
+     display: block;
+ }
+ 
+ .navigation .itemSectionContent .item {
+     border-bottom: 1px solid white;
+     cursor: pointer;
+     color: white;
+ }
+ 
+ .navigation .itemSectionContent .item:last-child {
+     border-bottom: 1px solid white;
+ }
+ 
+ .navigation .itemSectionContent .item:hover {
+     background-color: #666666;
+ }
+ 
+ .navigation .itemSectionContent .item .text {
+     padding: 0.5em;
+     display: inline-block;
+ }
+ 
+ .navigation .itemSectionContent .item .dropDown {
+     padding: 0.5em;
+     float: right;
+ }
+ 
+ .navigation .itemSectionContent .item .itemHheader {
+     border-bottom: 1px solid white;
+ }
+ 
+ .navigation .itemSectionContent .item .dropDownDiv {
+     background-color: #4c4c4c;
+ }
+ 
+ .navigation .itemSectionContent .item:hover .dropDownDiv {
+     background-color: #4c4c4c;
+ }
+ 
+ .navigation .itemSectionContent .item.expanded .itemHeader .dropDown {
+     transform: rotate(180deg);
+ }
+ 
+ .navigation .itemSectionContent .item .dropDownDiv {
+     display: none;
+ }
+ 
+ .navigation .itemSectionContent .item .dropDownDiv .dropDownDivAddFunctionItem {
+     padding-top: 0.5em;
+     padding-bottom: 0.5em;
+     background-color: #464646;
+ }
+ 
+ .navigation .itemSectionContent .item .dropDownDiv .dropDownDivAddFunctionItem .title {
+     padding-left: 1em;
+ }
+ 
+ .navigation .itemSectionContent .item .dropDownDiv .dropDownDivAddFunctionItem .title::before {
+     content: '-';
+     padding-right: 0.25em;
+ }
+ 
+ .navigation .deleteSection {
+     background-color: #D9534F;
+     color: white;
+     width: 100%;
+ }
+ 
+ .navigation .deleteSection .text {
+     text-align: center;
+     padding: 0.5em;
+     font-weight: 700;
+ }
+ 
+ .navigation .itemSectionContent .item.selectColor {
+     width: 100%;
+     padding: 0.5em 0 0.5em 0;
+ }
+ 
+ .navigation .itemSectionContent .item.selectColor:hover {
+     background-color: #323232;
+ }
+ 
+ .navigation .itemSectionContent .item.selectColor .color {
+     width: calc((100% - 4em) / 7);
+     height: 1.5em;
+     cursor: pointer;
+     margin-left: 0.5em;
+     display: inline-block;
+ }
+ 
+ .navigation .itemSectionContent .item.selectColor .color:nth-child(1) {
+     background-color: lightsalmon;
+ }
+ 
+ .navigation .itemSectionContent .item.selectColor .color:nth-child(2) {
+     background-color: lightgreen;
+ }
+ 
+ .navigation .itemSectionContent .item.selectColor .color:nth-child(3) {
+     background-color: lightblue;
+ }
+ 
+ .navigation .itemSectionContent .item.selectColor .color:nth-child(4) {
+     background-color: lightcoral;
+ }
+ 
+ .navigation .itemSectionContent .item.selectColor .color:nth-child(5) {
+     background-color: lightseagreen;
+ }
+ 
+ .navigation .itemSectionContent .item.selectColor .color:nth-child(6) {
+     background-color: lightsteelblue;
+ }
+ 
+ .navigation .navigationToggle {
+     color: #e5e5e5;
+     cursor: pointer;
+     position: absolute;
+     bottom: 0;
+     width: 100%;
+ }
+ 
+ .navigation .navigationToggle .text {
+     display: inline-block;
+     font-size: 18px;
+     padding: 18px 0 18px 9px;
+ }
+ 
+ .navigation .navigationToggle .symbole {
+     font-size: 30px;
+     float: right;
+     padding: 9px 21px 9px 21px;
+     transition: all 0.25s;
+ }
+ 
+ .navigation .navigationToggle:hover {
+     color: white;
+ }
+ 
+ .navigation.slideToggle {
+     overflow: hidden;
+     text-overflow: hidden;
+ }
+ 
+ .navigation.slideToggle .navigationToggle .text {
+     display: none;
+ }
+ 
+ .navigation.slideToggle .navigationToggle .symbole {
+     transform: rotate(180deg);
+ }
+ 
+ .navigation.slideToggle .itemSection {
+     display: none;
+ }
+ 
+ .navigation.slideToggle~.structContent {
+     width: calc(100% - 61px);
+ }
+ 
+ .structContent {
+     height: calc(100% - 4.25em - 1px);
+     width: calc(75% - 251px);
+     float: left;
+     margin-top: 1px;
+ }
+ 
+ .structContent .mainStruct {
+     border: 1px solid black;
+     width: 90%;
+     height: auto;
+     margin: 0 auto;
+     position: relative;
+     margin-top: 4%;
+ }
+ 
+ .structContent .mainStruct .mainStructHeader {
+     //padding: 0.5em;
+ }
+ 
+ .structContent .mainStruct .mainStructHeader .title {
+     width: calc(100% - 2em);
+     margin-left: 2em;
+     outline: none;
+     padding: 0.5em 0 0.5em 0;
+ }
+ 
+ .structContent .mainStruct .dropZone {
+     background: #e5e5e5;
+     min-height: 2em;
+     border: 1px solid black;
+     border-right: none;
+     width: calc(100% - 2em - 1px);
+     margin-left: 2em;
+ }
+ 
+ .insertBefore,
+ .insertAfter {
+     height: auto;
+     background-color: #dcdcdc;
+     width: 100%;
+     min-height: 2em;
+     
+ }
+ 
+ 
+ .mainStruct .insertBefore .dropZoneBefore {
+     border-bottom: none;
+ }
+ 
+ .mainStruct .insertAfter .dropZoneAfter {
+     border-top: none;
+ }
+ 
+ .structContent .mainStruct .mainStructBottom {
+     height: 2em;
+ }
+ 
+ .menuBar {
+     height: 1em;
+ }
+ 
+ .structTabs {
+     height: 2.75em;
+     box-shadow: 0px 2px 2px #cccccc;
+ }
+ 
+ html,
+ body {
+     height: 100%;
+ }
+ 
+ .menuBar .dropDownDiv .dropDownContent .dropDownOption.inActive#goBack {
+     opacity: 0.4;
+     cursor: auto;
+ }
+ 
+ .menuBar .dropDownDiv .dropDownContent .dropDownOption.inActive#goBack:hover {
+     background-color: white;
+ }
+
+ .browserBlock {
+     position: fixed;
+     background-color: rgba(255,255,255,0.75);
+     z-index: 175;
+     top: 0;
+     left: 0;
+     height: 100vh;
+     width: 100vw;
+ }
+ .browserBlock .description {
+     position: relative;
+     margin: 12vh auto;
+     width: 60vh;
+     padding: 2em;
+     background-color: #D9534F;
+     border-radius: 3px;
+     box-shadow: 3px 3px 3px #444;
+ }
+.browserBlock .tryOut {
+    background-color: #ACAEB9;
+    width: 60vw;
+    margin-left: 20vw;
+    position: absolute;
+    height: 25vh;
+    bottom: 20vw;
+    border-radius: 3px;
+    box-shadow: 3px 3px 3px #444;
+}
+.browserBlock .tryOut .title {
+    font-size: 20px;
+    padding-top: 1em;
+    margin-left: 1em;
+}
+.browserBlock .tryOut ul {
+    margin-top: 2em;
+    margin-left: 3em;
+    font-size: 17px;
+}
+.browserBlock .tryOut ul li {
+    padding-top: 0.15em;
+    padding-bottom: 0.15em;
+}
+.browserBlock .tryOut ul li .text {
+    display: inline-block;
+}
+
+
+.informationDiv .information_content .informationContent .singleDivContent .characteristicsDivContent {
+	padding-bottom: 1em;
+}
+.informationDiv .information_content .informationContent .singleDivContent .characteristicsDivContent .settingsLabel {
+	color: #333333;
+	display: inline-block;
+	margin-left: 3%;
+}
+.informationDiv .information_content .informationContent .singleDivContent .characteristicsDivContent .customDropDown {
+	display: inline-block;
+	position: relative;
+	width: 70%;
+	background-color: #fcfcfc;
+}
+.informationDiv .information_content .informationContent .singleDivContent .characteristicsDivContent .customDropDown .customDropDownTitle {
+	border-bottom: 2px solid #ccc;
+	padding: 0.3em;
+	width: 100%;
+	transition: all 0.25s ease-in-out;
+}
+.informationDiv .information_content .informationContent .singleDivContent .characteristicsDivContent .customDropDown .customDropDownTitle:hover,
+.informationDiv .information_content .informationContent .singleDivContent .characteristicsDivContent .customDropDown .customDropDownTitle:active,
+.informationDiv .information_content .informationContent .singleDivContent .characteristicsDivContent .customDropDown .customDropDownTitle.active {
+	border-bottom: 2px solid #088DA5;
+}
+.informationDiv .information_content .informationContent .singleDivContent .characteristicsDivContent .customDropDown .customDropDownTitle .text {
+
+}
+.informationDiv .information_content .informationContent .singleDivContent .characteristicsDivContent .customDropDown .customDropDownTitle .expand {
+}
+.informationDiv .information_content .informationContent .singleDivContent .characteristicsDivContent .customDropDown .customDropDownTitle .expand:after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 13px;
+	width: 0; 
+	height: 0; 
+	border-left: 6px solid transparent;
+	border-right: 6px solid transparent;
+	border-top: 6px solid #999999;
+	z-index: 1;
+ }
+.informationDiv .information_content .informationContent .singleDivContent .characteristicsDivContent .customDropDown .customDropDownContent {
+	position: absolute;
+	width: 100%;
+	padding: 0 0.3em 0 0.3em;
+	background-color: #f7f7f7;
+	height: 12em;
+	overflow-y: scroll;
+	z-index: 12;
+	display: none;
+}
+.informationDiv .information_content .informationContent .singleDivContent .characteristicsDivContent .customDropDown .customDropDownContent .item {
+	display: block;
+	border-bottom: 1px solid #cccccc;
+	padding: 0.3em;
+	width: 100%;
+	cursor: pointer;
+	margin-left: -0.3em;
+}
+.informationDiv .information_content .informationContent .singleDivContent .characteristicsDivContent .customDropDown .customDropDownContent .item:hover {
+	background-color: #efefef;
+}
+.informationDiv .information_content .informationContent .singleDivContent .characteristicsDivContent .customDropDown .customDropDownContent .item .text {
+	padding-left: 0.1em;
+}

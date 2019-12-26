@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigationHeader>
+    <navigationItem>
+        <nodeName>Bedienung</nodeName>
+        <content>
+            <navigationItem>
+                <nodeName>a</nodeName>
+            </navigationItem>
+        </content>
+    </navigationItem>
+    <navigationItem>
+        <nodeName>Tutorials &amp; Anleitungen</nodeName>
+        <content>
+            <navigationItem>
+                <nodeName>Wie füge ich ein neues Element hinzu</nodeName>
+            </navigationItem>
+            <navigationItem>
+                <nodeName>Wie kann ich mehrer Struktogramme gleichzeitig erstellen</nodeName>
+            </navigationItem>
+            <navigationItem>
+                <nodeName></nodeName>
+            </navigationItem>
+        </content>
+    </navigationItem>
+</navigationHeader>

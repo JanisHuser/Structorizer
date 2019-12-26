@@ -1,0 +1,119 @@
+.documentationMainDiv {
+    position: fixed;
+    background-color: rgba(0,0,0,0.6);
+    top: 0;
+    left:0;
+    z-index: 150;
+    width: 100vw;
+    height: 100vh;
+    display: none;
+}
+.documentationMainDiv .innerDiv {
+    width: 80vw;
+    display: inline-block;
+    height: 100vh;
+    top: 0;
+    position: absolute;
+
+    
+}
+.documentationMainDiv .innerDiv .header {
+    background-color: #ededed;
+    font-size: 18px;
+    color: black;
+    border-bottom: 1px solid black;
+    
+}
+.documentationMainDiv .innerDiv .header .title {
+    display: inline-block;
+    padding-top: 0.5em;
+    padding-left: 1.5em;
+    padding-bottom: 0.5em;
+}
+.documentationMainDiv .innerDiv .header .close {
+    float: right;
+    padding-top: 1px;
+    padding-bottom: 2px;
+    font-size: 28px;
+    margin-right: 2em;
+    font-weight: 700;
+    cursor: pointer;
+}
+.documentationMainDiv .innerDiv .content {
+    width: calc(80vw - 1px);
+    height: calc(100vh - 42px);
+    background-color: #ededed;
+}
+.documentationMainDiv .navigationMenu {
+    display: inline-block;
+    width: 20vw;
+    background-color: #dbdbdb;
+    color: black;
+    height: 100vh;
+    position: relative;
+    
+}
+
+.documentationMainDiv .navigationMenu::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+	background-color: #F5F5F5;
+}
+
+.documentationMainDiv .navigationMenu::-webkit-scrollbar
+{
+	width: 12px;
+	background-color: #F5F5F5;
+}
+
+.documentationMainDiv .navigationMenu::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #D62929;
+}
+.documentationMainDiv .navigationMenu .navigationMenuTitle {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    padding-left: 1em;
+    font-size: 18px;
+    z-index: 150;
+    border-bottom: 1px solid black;
+    
+    width: calc(20vw - 1em);
+    background-color: #dbdbdb;
+    border-right: 1px solid #b4b4b4;
+}
+.documentationMainDiv .navigationMenu .navigationMenuContent {
+    overflow-y: scroll;
+    height: calc(100vh - 42px);
+    border-right: 1px solid #333;
+}
+
+.documentationMainDiv .navigationMenu .navigationMenuContent .navigationItem {
+    display: block;
+}
+.documentationMainDiv .navigationMenu .navigationMenuContent .navigationItem .title {
+    display: inline-block;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+    padding-left: 1.25em;
+    position: relative;
+    cursor: context-menu;
+}
+.documentationMainDiv .navigationMenu .navigationMenuContent .navigationItem .expand {
+    background: #f9f9f9;
+    border: 1px solid grey;
+    font-size: 10px;
+    left: 8px;
+    top: -2px;
+    position: relative;
+    height: 12px;
+    width: 12px;
+
+    text-align: center;
+    display: inline-block;
+    box-shadow: inset -1px -1px 2px #cccccc;
+    cursor: context-menu;
+}
