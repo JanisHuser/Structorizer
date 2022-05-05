@@ -826,7 +826,7 @@
                 var fileContext = split2[0];
                 var fileType = split2[1];
                 openStructogramm(fileContext, fileType);
-                history.pushState(null, '', 'struct.php');
+                history.pushState(null, '', 'struct.html');
                 $(".createNewProjectDiv").hide();
             } else { //create new structogramm
                 $(".createNewProjectDiv").show();
@@ -1268,7 +1268,7 @@
 			formData.append("structContent", content);
 			formData.append("projectTitle", title);
 			$.ajax({
-				url: "shareStruct/shareStruct.php",
+				url: "shareStruct/sharestruct.html",
 				type: 'post',
 				data: formData,
 				dataType: 'html',
@@ -1341,7 +1341,7 @@
 			formData.append("structContent", content);
 			formData.append("structCode", structCode);
 			$.ajax({
-				url: "shareStruct/saveStruct.php",
+				url: "shareStruct/savestruct.html",
 				type: 'post',
 				data: formData,
 				dataType: 'html',
@@ -1449,11 +1449,11 @@
 		
 		//load struct if structcode is in the url
 		function testIfNeedToLoad() {
-			if("<?php echo $_GET["structCode"]; ?>" != "") {
-				openStructogramm("<?php echo $_GET["structCode"]; ?>", "sFile");
-				setProjectTitle("<?php echo $_GET["structCode"]; ?>");
-                $(".createNewProjectDiv").hide();
-			}
+			// if("<?php echo $_GET["structCode"]; ?>" != "") {
+			// 	openStructogramm("<?php echo $_GET["structCode"]; ?>", "sFile");
+			// 	setProjectTitle("<?php echo $_GET["structCode"]; ?>");
+            //     $(".createNewProjectDiv").hide();
+			// }
 		}
     </script>
 	<!-- Global site tag (gtag.js) - Google Analytics -->
@@ -1806,9 +1806,9 @@
 	<div class="messageBoxMain"></div>
 	
 	<div class="firstVisit">
-		<?php
+		<!-- <?php
 		include "firstVisit.php";
-		?>
+		?> -->
 	</div>
 	
 	<div class="shareStruct">

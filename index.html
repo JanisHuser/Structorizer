@@ -712,7 +712,7 @@
                 }
             });
 			$(".openStructEditor").click(function() {
-				location.href = "struct.php";
+				location.href = "struct.html";
 			});
             $(".openFileDialog").change(function () {
                 var file = document.getElementById("openFileDialog").files[0];
@@ -721,7 +721,7 @@
 
 
                 reader.onload = function (evt) {
-                    window.location.href = "struct.php#fileContext=" + evt.target.result +
+                    window.location.href = "struct.html#fileContext=" + evt.target.result +
                         "fileType=" + file.name.split('.').pop().toLowerCase();
                     //$(".mainStruct")[0].outerHTML = evt.target.result;
                 }
@@ -742,7 +742,7 @@
 				var formData = new FormData();
 			formData.append("structCode", $(".shareProjectCode").val());
 			$.ajax({
-				url: "loadStruct/loadStruct.php",
+				url: "loadStruct/loadStruct.html",
 				type: 'post',
 				data: formData,
 				dataType: 'html',
