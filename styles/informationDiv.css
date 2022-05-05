@@ -1,0 +1,322 @@
+.informationDiv {
+    position: fixed;
+    z-index: 150;
+    background-color: rgba(255, 255, 255, 0.75);
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    display: none;
+    border-radius: 4px;
+}
+.informationDiv .informationDivBox {
+    width: 75%;
+    height: 80%;
+    margin: 0 auto;
+    margin-top: 3%;
+
+    background-color: white;
+}
+.informationDiv .informationDivBox .informationHeader {
+    background-color: #3B5998;
+    color: white;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+
+}
+.informationDiv .informationDivBox .informationHeader .title {
+    padding: 0.75em;
+}
+.informationDiv .informationDivBox .informationLogic {
+    background-color: #bdc3c7;
+    padding: 0.5em;
+    position: relative;
+    text-align: right;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+.informationDiv .informationDivBox .informationContent {
+    padding: 0.5em;
+    height: calc(100% - 55px - 1em - 43px);
+    overflow-y: scroll;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv {
+    margin-top: 1%;
+
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>.label {
+    padding: 0.1em 0.5em;
+    width: fit-content;
+    clear: both;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>input {
+    outline: none;
+    border: none;
+    padding: 0.5em;
+    font-size: 16px;
+    transition: all .1s ease-out;
+    border-bottom: 2px solid #bdc3c7;
+    width: 90%;
+    margin-left: 0.5%;
+    background-color: #ecf0f1;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>input:focus {
+    border-bottom: 2px solid #3B5998;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>textarea {
+    outline: none;
+    border: none;
+    padding: 0.5em;
+    color: #6F6F6F;
+    font-size: 14px;
+    transition: all .1s ease-out;
+    border-bottom: 2px solid #bdc3c7;
+    width: 90%;
+    margin-left: 0.5%;
+    background-color: #ecf0f1;
+    resize: none;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>textarea:focus {
+    border-bottom: 2px solid #3B5998;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>.customToggleSwitch {
+    width: 20%;
+    margin-left: 1%;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>.customList {
+    width: calc(91% + 0.5em);
+    padding: 0.25em;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>.customList>.customListHeader {
+    font-weight: 700;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>.customList>.customListHeader>.position {
+    display: inline-block;
+    width: 3em;
+    padding: .25em;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>.customList>.customListHeader>.case {
+    display: inline-block;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>.customList>.customListItems {
+    counter-reset: line;
+    line-height: 0;
+    font-size: 0;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>.customList>.customListItems>.customListItem:before {
+    counter-increment: line;
+    content: counter(line);
+    width: 4em;
+    font-size: 16px;
+    padding: .5em;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>.customList>.customListItems>.customListItem {
+    background-color: #E5E5E5;
+    padding: .25em;
+    line-height: 1.5em;
+    margin-top: 4px;
+    border-radius: 3px;
+}
+
+.informationDiv .informationDivBox .informationContent>.singleDiv>.customList>.customListItems>.customListItem>.description {
+    display: inline-block;
+    width: calc(100% - 5em);
+    padding: .25em;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    background-color: transparent;
+    line-height: 1.5em;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>.customList>.customListItems>.customListItem>.deleteItem {
+    display: inline-block;
+    font-weight: 700;
+    font-size: 16px;
+    width: 2em;
+    text-align: center;
+    padding: .25em 0;
+    cursor: pointer;
+    line-height: 1.5em;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>.customList>.customListItems>.customListItem>.deleteItem:hover {
+    color: #D9534F;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>.customList>.customListItems>.customListItem.customListItemAddNew {
+    background-color: #E9E9E9;
+    margin-top: 1%;
+    line-height: 1.5em;
+    font-size: 16px;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>.customList>.customListItems>.customListItem.customListItemAddNew:before {
+    content: 'Neuen Fall hinzufügen:';
+    font-size: 15px;
+	width: auto;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>.customList>.customListItems>.customListItem.customListItemAddNew>.description {
+    width: calc(100% - 3.5em);
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>.customList>.customListItems>.customListItem.customListItemAddNew>.addItem {
+    display: inline-block;
+    font-weight: 700;
+    font-size: 20px;
+    width: 2em;
+    text-align: center;
+    padding: .25em 0;
+    cursor: pointer;
+}
+.informationDiv .informationDivBox .informationContent>.singleDiv>.customList>.customListItems>.customListItem.customListItemAddNew>.addItem:hover {
+    color: #5CB85C;
+}
+.informationDiv .informationDivBox .informationContent>.informationElementContent {
+    width: calc(90% + 1em);
+}
+.informationDiv .informationDivBox .informationContent>.informationElementContent>.singleDivTitle {
+    font-size: 18px;
+    padding: 0.5em;
+}
+.informationDiv .informationDivBox .informationContent>.informationElementContent>.singleDivTitle>.text {
+    
+}
+.informationDiv .informationDivBox .informationContent>.informationElementContent>.simulationDivContent {
+
+}
+.informationDiv .informationDivBox .informationContent>.informationElementContent>.simulationDivContent>.simulationSingleDiv {
+
+}
+
+.informationDiv .informationDivBox .informationContent>.informationElementContent>.simulationDivContent>.simulationSingleDiv>.singleLine {
+
+}
+.informationDiv .informationDivBox .informationContent>.informationElementContent>.simulationDivContent>.simulationSingleDiv>.singleLine>.title {
+    display: inline-block;
+    font-size: 16px;
+    padding: 0.5em;
+    vertical-align: top;
+    width: 20%;
+}
+.informationDiv .informationDivBox .informationContent>.informationElementContent>.simulationDivContent>.simulationSingleDiv>.singleLine>input {
+    display: inline-block;
+    border: none;
+    outline: none;
+    border-bottom: 2px solid #bdc3c7;
+    font-size: 16px;
+    vertical-align: top;
+    padding: 0.5em;
+    width: 40%;
+}
+.informationDiv .informationDivBox .informationContent>.informationElementContent>.simulationDivContent>.simulationSingleDiv>.singleLine>input:focus {
+    border-bottom: 2px solid #3B5998;
+}
+.singleDiv.mainStructParams {}
+.singleDiv.mainStructParams>.customListAdvanced>.customListItems>.customListItem:before {
+    counter-increment: line;
+    content: counter(line);
+    width: 4em;
+    font-size: 16px;
+    padding: .5em;
+	color: grey;
+}
+.singleDiv.mainStructParams>.customListAdvanced>.customListItems>.customListItem {
+    background-color: #E5E5E5;
+    padding: .25em;
+    line-height: 1.5em;
+    margin-top: 4px;
+    border-radius: 3px;
+}
+
+
+.singleDiv.mainStructParams>.customListAdvanced>.customListItems>.customListItem>.varName {
+    display: inline-block;
+    width: calc(100% - 5em);
+    padding: .25em;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    background-color: transparent;
+    line-height: 1.5em;
+}
+.singleDiv.mainStructParams>.customListAdvanced>.customListItems>.customListItem>.deleteItem {
+    display: inline-block;
+    font-weight: 700;
+    font-size: 16px;
+    width: 2em;
+    text-align: center;
+    padding: .25em 0;
+    cursor: pointer;
+    line-height: 1.5em;
+}
+.singleDiv.mainStructParams>.customListAdvanced>.customListItems>.customListItem>.deleteItem:hover {
+    color: #D9534F;
+}
+
+.singleDiv.mainStructParams>.customListAdvanced {
+	width: calc(91% + 0.5em);
+    padding: 0.25em;
+}
+.singleDiv.mainStructParams>.customListAdvanced>.customListItems {
+	counter-reset: line;
+    line-height: 0;
+    font-size: 0;
+}
+.singleDiv.mainStructParams>.customListAdvanced>.customListItems>.customListItem {
+	background-color: #E5E5E5;
+    padding: .25em;
+    line-height: 1.5em;
+    margin-top: 4px;
+    border-radius: 3px;
+}
+.singleDiv.mainStructParams>.customListAdvanced>.customListItems>.customListItem.customListItemAddNew  {
+    background-color: #E9E9E9;
+    margin-top: 1%;
+    line-height: 1.5em;
+    font-size: 16px;
+}
+.singleDiv.mainStructParams>.customListAdvanced>.customListItems>.customListItem.customListItemAddNew:before {
+	content: 'Übergabeparameter hinzufügen:';
+	font-size: 15px;
+	display: block;
+	width: auto;
+	color: black;
+}
+.singleDiv.mainStructParams>.customListAdvanced>.customListItems>.customListItem.customListItemAddNew>.dataType {
+	display: inline-block;
+	font-size: 16px;
+	padding: .25em;
+	background-color: white;
+	outline: none;
+	border: none;
+	border-bottom: 2px solid #b9b9b9;
+	line-height: 1.5em;
+transition: all .1s ease-out;
+}
+.singleDiv.mainStructParams>.customListAdvanced>.customListItems>.customListItem.customListItemAddNew>.dataType:focus {
+	border-bottom: 2px solid #3B5998;
+}
+.singleDiv.mainStructParams>.customListAdvanced>.customListItems>.customListItem.customListItemAddNew>.dataType>option {
+	background-color: white;
+}
+.singleDiv.mainStructParams>.customListAdvanced>.customListItems>.customListItem.customListItemAddNew>.dataType>option:checked {
+	background-color: #f7f7f7;
+}
+.singleDiv.mainStructParams>.customListAdvanced>.customListItems>.customListItem.customListItemAddNew>.varName {
+	width: auto;
+	display: inline-block;
+	padding: .25em;
+	font-size: 16px;
+	border: none;
+	outline: none;
+	width: 50%;
+	background-color: transparent;
+	line-height: 1.5em;
+	transition: all .1s ease-out;
+}
+.singleDiv.mainStructParams>.customListAdvanced>.customListItems>.customListItem.customListItemAddNew>.addItem {
+	display: inline-block;
+	line-height: 1.5em;
+	float: right;
+	width: 2em;
+	cursor: pointer;
+}
+.singleDiv.mainStructParams>.customListAdvanced>.customListItems>.customListItem.customListItemAddNew>.addItem:hover {
+	color: #5CB85C;
+}

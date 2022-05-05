@@ -1,0 +1,82 @@
+.createElemsInformation {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.25);
+	z-index: 250;
+	display: none;
+}
+.createElemsInformation>.createElemsInformationBox {
+	width: 60%;
+	height: 75vh;
+	margin: 10vh auto;
+	border-radius: 6px;
+	background-color: white;
+}
+.createElemsInformation>.createElemsInformationBox>.createElemsInformationBoxHeader {
+	background-color: #3B5998;
+	font-size: 0;
+	color: white;
+	border-top-left-radius: 6px;
+	border-top-right-radius: 6px;
+	
+}
+.createElemsInformation>.createElemsInformationBox>.createElemsInformationBoxHeader>.createElemsInformationBoxHeaderTitle {
+	font-size: 20px;
+	font-weight: 700;
+	display: inline-block;
+	padding: 0.5em;
+}
+.createElemsInformation>.createElemsInformationBox>.createElemsInformationBoxHeader>.createElemsInformationBoxHeaderClose {
+	font-size: 20px;
+	font-weight: 700;
+	display: inline-block;
+	padding: 0.5em;
+	float: right;
+	cursor: pointer;
+}
+.createElemsInformation>.createElemsInformationBox>.createElemsInformationBoxContent {
+	padding: 0.25em;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	height: calc(100% - 44px - 0.5em);
+}
+.createElemsInformation>.createElemsInformationBox>.createElemsInformationBoxContent>.mainContentSDiv {
+
+}
+.createElemsInformation>.createElemsInformationBox>.createElemsInformationBoxContent>.mainContentSDiv>.mainTitle {
+	font-weight: 700;
+	padding: 0.25em;
+}
+.createElemsInformation>.createElemsInformationBox>.createElemsInformationBoxContent>.mainContentSDiv>.mainDescription {
+	padding: 0.25em;
+	padding-top: 0.5em;
+}
+.createElemsInformation>.createElemsInformationBox>.createElemsInformationBoxContent>.mainContentSDiv>.smallTitle {
+	padding: 0.5em;
+}
+.createElemsInformation>.createElemsInformationBox>.createElemsInformationBoxContent>.mainContentSDiv>.codeExample {
+	counter-reset: line;
+	font-size: 14px;
+	line-height: 0;
+	background-color: #464646;
+	width: calc(100% - 1em);
+	margin: 0 auto;
+}
+.createElemsInformation>.createElemsInformationBox>.createElemsInformationBoxContent>.mainContentSDiv>.codeExample>.singleLine:before {
+	 counter-increment: line;
+    content: counter(line);
+    display: inline-block;
+    border-right: 1px solid #ddd;
+    margin-right: .5em;
+    color: #888;
+    width: 4em;
+    text-align: center;
+	font-size: 12px;
+}
+.createElemsInformation>.createElemsInformationBox>.createElemsInformationBoxContent>.mainContentSDiv>.codeExample>.singleLine {
+	line-height: 1.5em;
+	display: block;
+}

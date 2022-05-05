@@ -1,0 +1,7 @@
+mainStruct0:{
+            <div class="mainStructHeader">
+                <div class="title">title</div>
+            </div>
+            <div class="dropZone innerDroppable"><div class="elemStruct elemStruct0" draggable="true" id="elemStruct1" data_type="While-Schlaufe" data_title="asdf" data_description="" enginechecked="false"><div class="elemHeader"><div class="elemTitle">asdf</div></div><div class="innerElements innerDroppable"></div><div class="elemBottom"> </div></div></div>
+            <div class="mainStructBottom"></div>
+        }mainStruct1:{<div class="mainStructHeader"><div class="title">Titel</div></div><div class="dropZone innerDroppable"><div class="elemStruct elemStruct0" draggable="true" id="elemStruct2" data_type="While-Schlaufe" data_title="" data_description="" enginechecked="false"><div class="elemHeader"><div class="elemTitle">While-Schlaufe</div></div><div class="innerElements innerDroppable"></div><div class="elemBottom"> </div></div></div><div class="mainStructBottom"></div>}mainStruct2:{<div class="mainStructHeader"><div class="title">Titel</div></div><div class="dropZone innerDroppable"><div class="elemStruct elemStruct2" draggable="true" id="elemStruct3" data_type="For-Schleife" data_title="" data_description="" enginechecked="false"><div class="elemHeader"><div class="elemTitle">For-Schleife</div></div><div class="innerElements innerDroppable"></div><div class="elemBottom"> </div></div></div><div class="mainStructBottom"></div>}

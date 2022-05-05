@@ -1,0 +1,10 @@
+.firstVisit {
+	z-index: 9999;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	position: fixed;
+	background-color: #e67e22;
+	display: none;
+}

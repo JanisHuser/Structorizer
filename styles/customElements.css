@@ -1,0 +1,55 @@
+body {
+    font-family: Verdana;
+  }
+  .customToggleSwitch {
+    position: relative;
+    margin-top: 1%;
+    margin-left: 2%;
+  }
+  .customToggleSwitch>.label {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 2px;
+    width: calc(97.5% - 4em)
+  }
+  .customToggleSwitch>input {
+    padding: 0.5em;
+    width: 4em;
+    height: 1.5em;
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 5;
+    display: inline-block;
+    vertical-align: top;
+  }
+  
+  .customToggleSwitch>.overlay {
+    background-color: #e5e5e5;
+    display: inline-block;
+    width: 3.5em;
+    height: 1.5em;
+    border-radius: 3em;
+    border: 1px solid grey;
+    position: relative;
+    transition: all 0.25s ease-in-out;
+    vertical-align: top;
+  }
+  .customToggleSwitch>.overlay>.check {
+    height: 20px;
+    width: 20px;
+    background-color: #fff;
+    position: absolute;
+    border-radius: 40px;
+    top: 2px;
+    transition: all 0.25s ease-in-out;
+    left: 0.125em;
+    box-shadow: 0px 0px 2px 2px #999;
+  }
+  .customToggleSwitch>input:checked ~ .overlay {
+    background-color: #6DC066;
+  }
+  .customToggleSwitch>input:checked ~.overlay>.check {
+    left: 2.125em;
+  }
+  

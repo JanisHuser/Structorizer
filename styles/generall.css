@@ -1,0 +1,1079 @@
+body {
+    font-family: Verdana;
+    margin: 0 auto;
+	
+}
+/* menuBar */
+
+.menuBar {
+    background-color: #f0f0f0;
+    display: table;
+    font-size: 90%;
+    width: 100%;
+	box-shadow: inset 0px 4px #F9BA22;
+	padding-top: 4px;
+	transition: all .25s ease-in;
+}
+.menuBar.notSaved {
+	box-shadow: inset 0px 4px #a9a9a9;
+}
+.menuBar .dropDownDiv {
+    display: inline-block;
+}
+
+.menuBar .dropDownDiv .titleButton {
+    transition: all 0.25s ease-in-out;
+    cursor: pointer;
+    padding: 0.25em 0.5em 0.25em 0.5em;
+    text-align: center;
+}
+
+.menuBar .dropDownDiv .titleButton:hover,
+.menuBar .dropDownDiv .titleButton.active {
+    background-color: #cccccc;
+}
+
+.menuBar .dropDownDiv .dropDownContent {
+    position: absolute;
+    z-index: 1;
+    background-color: white;
+    min-width: 24.5em;
+    display: none;
+    box-shadow: 2px 2px 2px #ccc;
+    font-size: 92.5%;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+}
+
+.menuBar .dropDownDiv .dropDownContent .dropDownOption {
+    padding: 0.25em;
+    cursor: pointer;
+    padding-left: 2.5em;
+	position: relative;
+}
+.menuBar .dropDownDiv .dropDownContent .dropDownOption.dropDownOptionWIP .text:before {
+	content: '[WIP]';
+	color: #7F7F7F;
+	padding-right: 0.5em;
+}
+
+.menuBar .dropDownDiv .dropDownContent .dropDownOption:hover {
+    background-color: #E5E5E5;
+}
+
+.menuBar .dropDownDiv .dropDownContent .dropDownOption .text {
+    display: inline-block;
+}
+
+.menuBar .dropDownDiv .dropDownContent .dropDownOption .shortCut {
+    display: inline-block;
+    padding-right: 0.8em;
+    color: #cccccc;
+    right: 1em;
+    position: absolute;
+    font-size: 90%;
+}
+.menuBar .dropDownDiv .dropDownContent .dropDownOption .expandTriangeLeft {
+	display: inline-block;
+	right: 0;
+	position: absolute;
+	padding-right: 0.8em;
+	
+}
+.menuBar .dropDownDiv .dropDownContent .dropDownOption .expandTriangleOptions {
+	position: absolute;
+    left: 0px;
+    margin-left: 100%;
+    background-color: white;
+    top: 0px;
+    width: fit-content;
+	display: none;
+    min-width: max-content;
+	padding-bottom: 0.5em;
+	padding-top: 0.5em;
+	min-width: 12em;
+	box-shadow: 2px 2px 2px #ccc;
+}
+.menuBar .dropDownDiv .dropDownContent .dropDownOption:hover .expandTriangleOptions {
+	display: block;
+}
+.menuBar .dropDownDiv .dropDownContent .dropDownOption .expandTriangleOptions .dropDownOption {
+	padding: 0.25em;
+	padding-left: 2.5em;
+	padding-right: 1em;
+}
+.menuBar .dropDownDiv .dropDownContent .dropDownOption .expandTriangleOptions .dropDownOption:hover {
+	background-color: #E5E5E5;
+}
+.menuBar .dropDownDiv .dropDownContent .dropDownOption .expandTriangleOptions .dropDownOption .text {
+	
+}
+.menuBar .dropDownDiv .dropDownContent .dropDownOption:hover .shortCut {
+    color: black;
+}
+
+
+.menuBar .dropDownDiv .dropDownContent .dropDownSeperator {
+    width: 100%;
+    height: 1px;
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+    background-color: #dbdbdb;
+}
+
+.toolbar {
+    color: #011F4B;
+    border-right: 1px solid #011F4B;
+    width: 15%;
+    display: table-cell;
+}
+
+.toolbar .itemSection .title {
+    color: #011F4B;
+    padding: 1.5%;
+    font-weight: 700;
+    border-bottom: 1px solid #011F4B;
+}
+
+.toolbar .itemSection .item {
+    cursor: pointer;
+    transition: all 0.25s ease-in-out;
+    padding: 2%;
+    border-bottom: 1px solid #011F4B;
+    background-color: white;
+}
+
+.toolbar .itemSection .item:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.toolbar .deleteSection {
+    margin: 0 auto;
+    margin-top: 5%;
+    cursor: pointer;
+    transition: all 0.25s ease-in-out;
+    border-bottom: 1px solid #011F4B;
+}
+
+.toolbar .deleteSection svg {
+    margin-left: 25%;
+}
+
+.toolbar .deleteSection svg g g {
+    transition: all 0.25s ease-in-out;
+}
+
+.toolbar .deleteSection:hover svg g g,
+.toolbar .deleteSection.onHoverActive svg g g {
+    fill: #D9534F;
+}
+
+.toolbar .itemSave {
+    cursor: pointer;
+    transition: all 0.25s ease-in-out;
+    padding: 2%;
+}
+
+.toolbar .itemSave:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.content {
+    display: table-cell;
+    overflow-y: scroll;
+}
+
+
+
+/* Tabs */
+
+.structTabs {
+    overflow: hidden;
+    overflow-x: scroll;
+    width: 100%;
+    height: auto;
+    background-color: #e5e5e5;
+    white-space: nowrap;
+    padding-bottom: 2px;
+}
+
+.structTabs::-webkit-scrollbar-track {
+    background-color: #e5e5e5;
+}
+
+.structTabs::-webkit-scrollbar {
+    height: 6px;
+    background-color: black;
+}
+
+.structTabs::-webkit-scrollbar-track-piece {
+    background-color: transparent;
+}
+
+.structTabs::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
+.structTabs .tabItem {
+    display: inline-table;
+    cursor: pointer;
+    background-color: #dadada;
+    font-size: 90%;
+    padding: 0.3em;
+    margin-left: 0.2em;
+}
+.structTabs .tabItem.notSaved {
+	box-shadow: inset 0px 3px #AE38CE;
+}
+.structTabs .tabItem .text {
+    display: table-cell;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 6em;
+    padding: 0.25em;
+}
+
+.structTabs .tabItem .close {
+    display: table-cell;
+    padding: 0.25em;
+    vertical-align: middle;
+    font-weight: 700;
+    opacity: 0;
+}
+
+.structTabs .tabItem.active {
+    color: black;
+    background-color: white;
+}
+
+.structTabs .tabItem:hover .close {
+    opacity: 1;
+}
+
+.structTabs .tabItem:nth-child(2) {
+    margin-left: -0.2em;
+}
+
+.structTabs .openNewTab {
+    cursor: pointer;
+    background-color: #939DA4;
+    margin-left: 0.2em;
+    padding: 0.3em;
+    display: inline-table;
+    font-size: 90%;
+}
+
+.structTabs .openNewTab .text {
+    padding: 0.25em;
+    display: table-cell;
+}
+
+.structTabs .openNewTab:hover {
+    background-color: #848D93;
+}
+
+.innerDroppable.onHoverActive {
+    border: 2px dashed grey;
+}
+
+.insertBefore {
+    height: 1em;
+    background-color: red;
+}
+
+.insertAfter {
+    height: 1em;
+    background-color: red;
+}
+
+
+/* Menu bar divs and items */
+
+.navigation {
+    height: calc(100% - 3.9em - 5px);
+    width: 250px;
+    float: left;
+    border-right: 1px solid black;
+    position: relative;
+    background-color: #dfdfe0;
+	transition: all 0.2s ease;
+}
+.navigation div {
+	transition: all 0.2s ease-in-out;
+}
+.navigation .itemSectionBottom {
+    bottom: 58px;
+    position: absolute;
+    width: 100%;
+}
+
+.navigation .itemSectionHeader {
+    width: 100%;
+    cursor: pointer;
+   	font-size: 18px;
+	font-weight: 700;
+}
+
+.navigation .itemSectionHeader .title {
+    padding: 0.4em;
+}
+
+.navigation .itemSectionContent {
+    display: block;
+}
+
+.navigation .itemSectionContent .item {
+    cursor: pointer;
+	padding-left: 0.25em;
+}
+
+.navigation .itemSectionContent .item:hover {
+    background-color: #B2B2B3;
+}
+
+.navigation .itemSectionContent .item .text {
+    padding: 0.5em;
+    display: inline-block;
+}
+
+.navigation .itemSectionContent .item .dropDown {
+    padding: 0.5em;
+    float: right;
+}
+
+
+.navigation .itemSectionContent .item .dropDownDiv {
+    background-color: #4c4c4c;
+}
+
+.navigation .itemSectionContent .item:hover .dropDownDiv {
+    background-color: #4c4c4c;
+}
+
+.navigation .itemSectionContent .item.expanded .itemHeader .dropDown {
+    transform: rotate(180deg);
+}
+
+.navigation .itemSectionContent .item .dropDownDiv {
+    display: none;
+}
+
+.navigation .itemSectionContent .item .dropDownDiv .dropDownDivAddFunctionItem {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    background-color: #464646;
+}
+
+.navigation .itemSectionContent .item .dropDownDiv .dropDownDivAddFunctionItem .title {
+    padding-left: 1em;
+}
+
+.navigation .itemSectionContent .item .dropDownDiv .dropDownDivAddFunctionItem .title::before {
+    content: '-';
+    padding-right: 0.25em;
+}
+
+.navigation .deleteSection {
+    background-color: #D9534F;
+    color: white;
+    width: 100%;
+}
+
+.navigation .deleteSection .text {
+    text-align: center;
+    padding: 0.5em;
+    font-weight: 700;
+}
+
+.navigation .itemSectionContent .item.selectColor {
+    width: 100%;
+    padding: 0.5em 0 0.5em 0;
+}
+
+.navigation .itemSectionContent .item.selectColor:hover {
+    background-color: #323232;
+}
+
+.navigation .itemSectionContent .item.selectColor .color {
+    width: calc((100% - 4em) / 7);
+    height: 1.5em;
+    cursor: pointer;
+    margin-left: 0.5em;
+    display: inline-block;
+}
+
+.navigation .itemSectionContent .item.selectColor .color:nth-child(1) {
+    background-color: lightsalmon;
+}
+
+.navigation .itemSectionContent .item.selectColor .color:nth-child(2) {
+    background-color: lightgreen;
+}
+
+.navigation .itemSectionContent .item.selectColor .color:nth-child(3) {
+    background-color: lightblue;
+}
+
+.navigation .itemSectionContent .item.selectColor .color:nth-child(4) {
+    background-color: lightcoral;
+}
+
+.navigation .itemSectionContent .item.selectColor .color:nth-child(5) {
+    background-color: lightseagreen;
+}
+
+.navigation .itemSectionContent .item.selectColor .color:nth-child(6) {
+    background-color: white;
+}
+
+.navigation .navigationToggle {
+    cursor: pointer;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+	overflow: hidden;
+}
+
+.navigation .navigationToggle .text {
+    display: inline-block;
+    font-size: 18px;
+    padding: 18px 0 18px 9px;
+	overflow: hidden;
+}
+
+.navigation .navigationToggle .symbole {
+    font-size: 30px;
+    float: right;
+    padding: 9px 20px 9px 21px;
+    transition: all 0.25s;
+}
+
+.navigation .navigationToggle:hover {
+    
+}
+
+.navigation.slideToggle {
+    overflow: hidden;
+    text-overflow: hidden;
+	
+}
+
+.navigation.slideToggle .navigationToggle .text {
+    display: none;
+}
+
+.navigation.slideToggle .navigationToggle .symbole {
+    transform: rotate(180deg);
+}
+
+.navigation.slideToggle .itemSection {
+    display: none;
+	
+}
+
+.navigation.slideToggle~.structContent {
+    width: calc(75% - 61px);
+}
+
+.navigation .navigationItemContent {
+	overflow-y: scroll;
+	height: calc(100% - 58px - 36px);
+}
+.navigation:not(.slideToggle) .navigationItemContent::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px #b2b3b7;
+	border-radius: 5px;
+	background-color: #dfdfe0;
+}
+
+.navigation:not(.slideToggle) .navigationItemContent::-webkit-scrollbar {
+	width: 5px;
+	background-color: #F5F5F5;
+}
+
+.navigation:not(.slideToggle) .navigationItemContent::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #D62929;
+}
+.navigation.slideToggle .navigationItemContent {
+	overflow-y: hidden;
+}
+.structContent {
+    width: calc(85% - 252px);
+    height: calc(100% - 3.9em - 8px);
+    overflow: scroll;
+    float: left;
+    overflow-y: scroll;
+    margin-top: 2px;
+	overflow-x: hidden;
+}
+
+.structContent::-webkit-scrollbar-track {
+    background-color: white;
+}
+
+.structContent::-webkit-scrollbar {
+    width: 8px;
+    background-color: black;
+}
+
+.structContent::-webkit-scrollbar-thumb {
+    background-color: #343D46;
+    border-radius: 4px;
+}
+
+.structContent .mainStruct {
+    border: 1px solid black;
+    width: 90%;
+    height: auto;
+    margin: 0 auto;
+    position: relative;
+    margin-top: 4%;
+}
+
+.structContent .mainStruct .mainStructHeader .title {
+    width: calc(100% - 2em);
+    margin-left: 2em;
+    outline: none;
+    padding: 0.5em 0 0.5em 0;
+}
+
+.structContent .mainStruct .dropZone {
+    background: #e5e5e5;
+    min-height: 2em;
+    border: 1px solid black;
+    border-right: none;
+    width: calc(100% - 32px - 1px);
+    margin-left: 32px;
+}
+
+.insertBefore,
+.insertAfter {
+    height: auto;
+    background-color: #dcdcdc;
+    width: 100%;
+    min-height: 2em;
+}
+
+.mainStruct .insertBefore .dropZoneBefore {
+    border-bottom: none;
+}
+
+.mainStruct .insertAfter .dropZoneAfter {
+    border-top: none;
+}
+
+.structContent .mainStruct .mainStructBottom {
+    height: 2em;
+}
+
+.menuBar {
+    height: 1em;
+}
+
+.structTabs {
+    box-shadow: 0px 2px 2px #cccccc;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+.menuBar .dropDownDiv .dropDownContent .dropDownOption.inActive {
+    opacity: 0.4;
+    cursor: auto;
+}
+
+.menuBar .dropDownDiv .dropDownContent .dropDownOption.inActive:hover {
+    background-color: white;
+}
+
+.browserBlock {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.25);
+    z-index: 800;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    display: none;
+}
+
+.browserBlock .description {
+    position: relative;
+    margin: 12vh auto;
+    width: 60vh;
+    padding: 2em;
+    background-color: #D9534F;
+    border-radius: 3px;
+    box-shadow: 3px 3px 3px #444;
+}
+
+.browserBlock .tryOut {
+    background-color: #ACAEB9;
+    width: 60vw;
+    margin-left: 20vw;
+    position: absolute;
+    height: 25vh;
+    bottom: 20vw;
+    border-radius: 3px;
+    box-shadow: 3px 3px 3px #444;
+}
+
+.browserBlock .tryOut .title {
+    font-size: 20px;
+    padding-top: 1em;
+    margin-left: 1em;
+}
+
+.browserBlock .tryOut ul {
+    margin-top: 2em;
+    margin-left: 3em;
+    font-size: 17px;
+}
+
+.browserBlock .tryOut ul li {
+    padding-top: 0.15em;
+    padding-bottom: 0.15em;
+}
+
+.browserBlock .tryOut ul li .text {
+    display: inline-block;
+}
+.createNewProjectDiv {
+    position: fixed;
+    z-index: 200;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
+.createNewProjectDiv .contentDiv {
+    background-color: white;
+    position: relative;
+    width: 40%;
+    margin: 8% auto;
+    box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.32);
+    padding: 0.5em;
+	padding-bottom: 1.5em;
+}
+
+.createNewProjectDiv .contentDiv .description {
+    font-weight: 700;
+    border-bottom: 1px solid black;
+    padding: 0.25em;
+	margin: 1% auto;
+	width: calc(90% + 0.5em);
+	
+}
+
+.createNewProjectDiv .contentDiv .textBox {
+    outline: none;
+    width: calc(90% + 0.5em);
+    padding: 0.5%;
+    margin-top: 2%;
+    font-size: 100%;
+    border: none;
+    border-bottom: 2px solid #7f7f7f;
+	margin-bottom: 2%;
+	margin-left: 4%;
+}
+
+.createNewProjectDiv .contentDiv .textBox:focus {
+    border-bottom: 2px solid #088DA5;
+}
+
+.createNewProjectDiv .contentDiv .logic {
+	width: calc(90% + 1em);
+	margin: 0 auto;
+}
+
+.createNewProjectDiv .contentDiv .logic .accept {
+    display: inline-block;
+    box-shadow: 0px 4px #8E8E8E;
+    width: calc(100% - 1em);
+	margin: 0 auto;
+    padding: 0.5em;
+    cursor: pointer;
+    background-color: #d0d0d0;
+    text-align: center;
+    transition: all ease-out .1s;
+    margin-bottom: 2%;
+}
+
+.createNewProjectDiv .contentDiv .logic .accept:hover {
+    box-shadow: 0px 2px #8E8E8E;
+    transform: translate(0px, 2px);
+}
+
+.createNewProjectDiv .contentDiv .logic .accept:active {
+    box-shadow: 0px 0px;
+    transform: translate(0px, 4px);
+}
+
+.createNewProjectDiv .contentDiv .logic .accept.disabled {
+    display: inline-block;
+    width: calc(100% - 1em);
+	margin: 0 auto;
+    box-shadow: none;
+    padding: 0.5em;
+    cursor: pointer;
+    background-color: #f7f7f7;
+    border-radius: 2px;
+    text-align: center;
+    color: #b7b7b7;
+}
+
+.createNewProjectDiv .contentDiv .logic .accept.disabled:active,
+.createNewProjectDiv .contentDiv .logic .accept.disabled:hover {
+    background-color: #f7f7f7;
+    box-shadow: none;
+    transform: translate(0px, 0px);
+}
+.createNewProjectDiv .contentDiv .loadLastProject {
+	width: 90%;
+	margin: 0 auto;
+	padding: 0.5em;
+	background-color: #3d5bc5;
+	text-align: center;
+	cursor: pointer;
+	box-shadow: 0px 4px #8E8E8E;
+	transition: all .1s ease-out;
+}
+
+.createNewProjectDiv .contentDiv .loadLastProject .text {
+
+}
+.createNewProjectDiv .contentDiv .loadLastProject:hover {
+	box-shadow: 0px 2px #8E8E8E;
+	transform: translate(0px, 2px);
+}
+.createNewProjectDiv .contentDiv .loadLastProject:active {
+	box-shadow: none;
+    transform: translate(0px, 4px);
+}
+
+
+.structContent .documentHeader {
+    border: 1px solid black;
+    width: 98%;
+    font-size: 0;
+    display: none;
+}
+
+.structContent .documentHeader .documentHeaderDate {
+    display: inline-block;
+    font-size: 16px;
+    padding: 0.75em 0.25em;
+    width: calc(8em - 0.5em);
+    text-align: center;
+}
+
+.structContent .documentHeader .documentHeaderProjectTitle {
+    display: inline-block;
+    font-size: 16px;
+    padding: 0.75em 0.25em;
+    border-right: 1px solid black;
+    width: calc(100% - 8em - 1px - 0.5em);
+    text-align: center;
+    font-weight: 700;
+}
+
+.customSettings {
+    background-color: rgba(0, 0, 0, 0.25);
+    z-index: 500;
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    top: 0;
+    left: 0;
+    display: none;
+}
+
+.customSettings .settingsContent {
+    background-color: #ECECEC;
+    position: relative;
+    margin: 10vh auto;
+    height: 75vh;
+	width: 75%;
+	border-radius: 6px;
+}
+
+.customSettings .settingsContent .header {
+    background-color: #3B5998;
+    color: white;
+	border-top-left-radius: 6px;
+	border-top-right-radius: 6px;
+}
+
+.customSettings .settingsContent .header .title {
+    padding: 0.5em 0.5em 0.5em 1em;
+    font-size: 20px;
+    font-weight: 700;
+	display: inline-block;
+}
+.customSettings .settingsContent .header .settingsClose {
+	padding: 0.5em 0.5em 0.5em 1em;
+    font-size: 20px;
+    font-weight: 700;
+	display: inline-block;
+	float: right;
+	cursor: pointer;
+}
+
+.customSettings .settingsContent .mainContent {
+	padding: 1em;
+}
+
+.customSettings .settingsContent .mainContent .loadingContent {
+    width: 100%
+    height: calc(75vh - 16px - 1em);
+    vertical-align: top;
+	border-bottom-left-radius: 6px;
+	border-bottom-right-radius: 6px;
+	
+}
+.customSettings .settingsContent .mainContent .loadingContent .loadingContentPart {
+	
+}
+.customSettings .settingsContent .mainContent .loadingContent .loadingContentPart .loadingContentPartTitle {
+	font-weight: 700;
+	font-size: 18px;
+	border-bottom: 1px solid black;
+	padding: 0.5em;
+	margin: 0 auto;
+}
+.customSettings .settingsContent .mainContent .loadingContent .loadingContentPart .loadingContentPartContent {
+	margin: 0 auto;
+}
+
+.skiptranslate goog-te-gadget:not(.first-child) {
+	display: none;
+}
+.customContextMenu {
+    background-color: white;
+    border-radius: 2px;
+    box-shadow: 0px 0px 3px #000000;
+    position: absolute;
+    z-index: 150;
+    min-width: 17em;
+    display: none;
+}
+
+.customContextMenu .customContextMenuOption {
+    display: block;
+    border-bottom: 1px solid #ccc;
+    transition: all .1s ease-out;
+    cursor: pointer;
+    padding: 0.5em;
+}
+
+.customContextMenu .customContextMenuOption:hover {
+    background-color: #e2e2e2;
+}
+
+.customContextMenu .customContextMenuOption .text {
+    padding-left: 1em;
+}
+
+.paintBrush {
+    position: absolute;
+    z-index: 200;
+    left: 20%;
+    display: none;
+}
+
+.paintBrush svg #brush g path#brushFront {
+    box-shadow: 2px 2px 2px grey;
+}
+.customButton {
+    box-shadow: none
+}
+.customButton {
+    display: inline-block;
+    box-shadow: 0px 4px #8E8E8E;
+    padding: 0.5em 1em;
+    cursor: pointer;
+    background-color: #d0d0d0;
+    text-align: center;
+    transition: all ease-out .1s;
+    margin-bottom: 4px;
+}
+
+.customButton:hover {
+    box-shadow: 0px 2px #8E8E8E;
+    transform: translate(0px, 2px);
+}
+
+.customButton:active {
+    box-shadow: 0px 0px;
+    transform: translate(0px, 4px);
+}
+.messageBoxMain {
+	position: fixed;
+	top: 1%;
+	right: 1%;
+}
+.messageBoxMain>.singleMessage {
+	font-size: 0;
+	background-color: rgba(0,0,0,0.6);
+	border-radius: 8px;
+	color: white;
+	position: relative;
+	transition: all .1s ease-in;
+	margin-top: 2%;
+}
+.messageBoxMain>.singleMessage>.messageTitle {
+	font-size: 16px;
+	display: inline-block;
+	padding: 1em;
+}
+.messageBoxMain>.singleMessage>.messageDelete {
+	font-size: 16px;
+	display: inline-block;
+	font-weight: 700;
+	padding: 1em;
+	cursor: pointer;
+}
+
+.infoSite {
+	background-color: rgba(0, 0, 0, 0.25);
+	z-index: 250;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	position: fixed;
+	display: none;
+}
+.infoSite>.infoSiteMain {
+	background-color: white;
+	width: 60%;
+	height: 80%;
+	margin: 5% auto;
+}
+.infoSite>.infoSiteMain>.infoSiteHeader {
+	background-color: #3B5998;
+	color: white;
+	padding: 1em;
+	border-top-left-radius: 6px;
+	border-top-right-radius: 6px;
+	font-size:0;
+}
+.infoSite>.infoSiteMain>.infoSiteHeader>.text {
+	font-size: 20px;
+	font-weight: 700;
+	padding: 1em;
+	display: inline-block;
+	width: calc(100% - 98px);
+}
+.infoSite>.infoSiteMain>.infoSiteHeader>.close {
+	font-size: 20px;
+	font-weight: 700;
+	padding: 1em;
+	display: inline-block;
+	text-align: right;
+	cursor: pointer;
+}
+.infoSite>.infoSiteMain>.infoSiteContent {
+	background-color: #E5E5E5;
+	height: calc(100% - 51px);
+}
+.infoSite>.infoSiteMain>.infoSiteContent>.infoSiteContentSingleDiv {
+	width: calc(100% - 1em);
+	padding: 0.5em;
+}
+.infoSite>.infoSiteMain>.infoSiteContent>.infoSiteContentSingleDiv>.titleInfoSite {
+	font-weight: 700;
+}
+.infoSite>.infoSiteMain>.infoSiteContent>.infoSiteContentSingleDiv>.contentInfoSite {
+	padding-left: 0.25em;
+	padding-top: 0.25em;
+	width: calc(100% - 0.25em);
+	overflow: hidden;
+	font-size: 14px;
+}
+.normalView {
+	height: calc(100% - 28px);
+	overflow: hidden;
+	transition: all 0.4s ease-in;
+	display: inline-block;
+	width: 100%;
+}
+.normalView>.navigation {
+	height: calc(100% - 39px);
+}
+
+.shareStruct {
+	background-color: rgba(0, 0, 0, 0.25);
+    z-index: 500;
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    top: 0;
+    left: 0;
+    display: none;
+}
+.shareStruct .shareStructContainer {
+	   background-color: #ECECEC;
+    position: relative;
+    margin: 10vh auto;
+    height: 75vh;
+    width: 75%;
+    border-radius: 6px;
+}
+.shareStruct .shareStructContainer .shareStructHeader {
+	background-color: #3B5998;
+    color: white;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+.shareStruct .shareStructContainer .shareStructHeader .headerTitle {
+	padding: 0.5em 0.5em 0.5em 1em;
+    font-size: 20px;
+    font-weight: 700;
+    display: inline-block;
+}
+.shareStruct .shareStructContainer .shareStructHeader .shareStructClose {
+	padding: 0.5em 0.5em 0.5em 1em;
+    font-size: 20px;
+    font-weight: 700;
+    display: inline-block;
+    float: right;
+    cursor: pointer;
+}
+.shareStruct .shareStructContainer .shareStructContent {
+	padding: 1em;
+}
+.shareStruct .shareStructContainer .shareStructContent .description {}
+.shareStruct .shareStructContainer .shareStructContent .description strong {
+	font-weight: 700;
+}
+.shareStruct .shareStructContainer .shareStructContent .description>a {
+
+}
+.shareStruct .shareStructContainer .shareStructContent .description>a>strong {
+
+}
+.circleLoadingBar {
+	background-color: rgba(0, 0, 0, 0.25);
+    z-index: 900;
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    top: 0;
+    left: 0;
+    display: none;
+}
+.circleLoadingBar>.loadingBar {
+	border: 16px solid #f3f3f3;
+  	border-radius: 50%;
+  	border-top: 16px solid #3498db;
+  	width: 120px;
+  	height: 120px;
+  	-webkit-animation: spin 2s linear infinite; /* Safari */
+  	animation: spin 2s linear infinite;
+}

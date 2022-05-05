@@ -1,0 +1,163 @@
+.selectStructsDiv {
+    background-color: rgba(255, 255, 255, 0.7);
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 150;
+    position: fixed;
+}
+
+.selectStructsDiv .contentDiv {
+    width: 75%;
+    margin: 5% auto;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0px 0px 2px 2px #ccc;
+    position: relative;
+    padding-bottom: 4em;
+}
+
+.selectStructsDiv .contentDiv .header {
+    background-color: #2175D9;
+    padding: 0.75em;
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
+}
+
+.selectStructsDiv .contentDiv .header .text {
+    color: white;
+}
+
+.selectStructsDiv .contentDiv .container {
+    background-color: white;
+    height: 40vh;
+    overflow-y: scroll;
+    border-bottom: 1px solid #b2b2b2;
+}
+
+.selectStructsDiv .contentDiv .container .structsTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.selectStructsDiv .contentDiv .container .structsTable tr.tableHeader {
+    border-bottom: 2px solid black;
+    width: 100%;
+    background-color: white;
+}
+
+.selectStructsDiv .contentDiv .container .structsTable tr {}
+
+.selectStructsDiv .contentDiv .container .structsTable tr th.selectOption {
+    width: 2em;
+    text-align: center;
+    border-right: 1px solid #b2b2b2;
+}
+
+.selectStructsDiv .contentDiv .container .structsTable tr:last-child {}
+
+.selectStructsDiv .contentDiv .container .structsTable tr th input[type=checkbox] {}
+
+.selectStructsDiv .contentDiv .container .structsTable tr th {
+    text-align: left;
+    padding: 0.5em 0.25em;
+}
+
+.selectStructsDiv .contentDiv .container .structsTable tr td {
+    text-align: left;
+    padding: 0.5em 0.25em;
+}
+
+.selectStructsDiv .contentDiv .container .structsTable tr:nth-child(even) {
+    background-color: #efefef;
+}
+
+.selectStructsDiv .contentDiv .container .structsTable tr td input[type=checkbox] {}
+
+.selectStructsDiv .contentDiv .container .structsTable tr td.selectOption {
+    width: 2em;
+    border-right: 1px solid #b2b2b2;
+    text-align: center;
+}
+
+.selectStructsDiv .contentDiv .contentLogic {
+    position: absolute;
+    right: 1%;
+    bottom: 3%;
+}
+
+.selectStructsDiv .contentDiv .contentLogic .contentLogicAccept {
+    display: inline-block;
+    box-shadow: 2px 2px 2px #cccccc;
+    width: 8em;
+    padding: 0.5em;
+    cursor: pointer;
+    background-color: #e2e2e2;
+    border-radius: 2px;
+    text-align: center;
+}
+
+.selectStructsDiv .contentDiv .contentLogic .contentLogicAbort {
+    display: inline-block;
+    box-shadow: 2px 2px 2px #cccccc;
+    width: 8em;
+    padding: 0.5em;
+    cursor: pointer;
+    background-color: #e2e2e2;
+    border-radius: 2px;
+    text-align: center;
+    margin-lefT: 8px;
+}
+
+.selectStructsDiv .contentDiv .contentLogic .contentLogicAccept:hover,
+.selectStructsDiv .contentDiv .contentLogic .contentLogicAbort:hover,
+.selectStructsDiv .contentDiv .contentLogic .contentLogicAccept:active,
+.selectStructsDiv .contentDiv .contentLogic .contentLogicAbort:active {
+    background-color: #bebebe;
+}
+
+
+/* advanced settings div */
+
+.selectStructsDiv .advancedDiv {
+    width: 96%;
+    margin: 0 auto;
+}
+.selectStructsDiv .advancedDiv .headerDiv {
+    border-bottom: 1px solid #ccc;
+    padding: 0.5em;
+    position: relative;
+    cursor: pointer;
+}
+.selectStructsDiv .advancedDiv .headerDiv .headerDivText {
+    display: inline-block;
+}
+.selectStructsDiv .advancedDiv .headerDiv .expand {
+    display: inline-block;
+}
+.selectStructsDiv .advancedDiv .headerDiv .expand:after {
+    content: "";
+    position: absolute;
+    right: 1em;
+    top: 16px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #999999;
+    z-index: 1;
+}
+
+.selectStructsDiv .advancedDiv.active .headerDiv .expand:after {
+    border-top: 8px solid #333333;
+}
+.selectStructsDiv .advancedDiv.active .headerDiv {
+    border-bottom: 1px solid #333333;
+}
+.selectStructsDiv .advancedDiv .advancedDivContent {
+    display: none;
+}
+.selectStructsDiv>.advancedDiv.active>.advancedDivContent {
+    display: block;
+}

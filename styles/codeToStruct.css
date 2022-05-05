@@ -1,0 +1,129 @@
+    .convertCodeToStruct {
+        background-color: rgba(255, 255, 255, 0.5);
+        z-index: 200;
+        top: 0;
+        left: 0;
+        position: fixed;
+        height: 100%;
+        width: 100%;
+		display: none;
+    }
+    
+    .convertCodeToStruct>.mainContent {
+        background-color: white;
+        width: 80%;
+        height: 90%;
+        margin: 2.5% auto;
+        box-shadow: 0px 0px 8px grey;
+        border-radius: 3px;
+    }
+    
+    .convertCodeToStruct>.mainContent>.mainHeader {
+        background-color: #31698A;
+        color: white;
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+        padding: 1em;
+    }
+    
+    .convertCodeToStruct>.mainContent>.mainContainer {
+        max-height: calc(100% - 118px);
+        height: calc(100% - 118px);
+        min-height: calc(100% - 118px);
+    }
+    
+    .convertCodeToStruct>.mainContent>.mainContainer>.codeContainer {
+        background-color: #fff;
+        margin: 0 auto;
+        counter-reset: line;
+        line-height: 0;
+        padding: .5em;
+        max-height: calc(100% - 1em);
+        height: calc(100% - 1em);
+        min-height: calc(100% - 1em);
+        overflow-y: scroll;
+        font-family: monospace;
+    }
+    
+    .convertCodeToStruct>.mainContent>.mainContainer>.codeContainer>.singleLine {
+        outline: none;
+        display: block;
+        white-space: nowrap;
+        line-height: 1.5em;
+    }
+     .convertCodeToStruct>.mainContent>.mainContainer>.codeContainer>.singleLine:empty {
+		content: ' ';
+	}
+    .convertCodeToStruct>.mainContent>.mainContainer>.codeContainer>.singleLine:before {
+        counter-increment: line;
+        content: counter(line);
+        display: inline-block;
+        border-right: 1px solid #ddd;
+        padding: 0 .5em;
+        margin-right: .5em;
+        color: #888;
+        width: 4em;
+        text-align: center;
+    }
+    
+    .convertCodeToStruct>.mainContent>.mainContainer>.codeContainer>.singleLine>span {
+        display: inline-block;
+        line-height: 1.5em;
+        outline: none;
+    }
+    
+    .convertCodeToStruct>.mainContent>.mainContainer>.codeContainer>.singleLine>span br {
+        display: none;
+    }
+    /*
+.convertCodeToStruct>.mainContent>.mainContainer>div {
+    
+}
+
+.convertCodeToStruct>.mainContent>.mainContainer>div>span {
+    
+}
+
+.convertCodeToStruct>.mainContent>.mainContainer>div>span:before {
+    
+}
+
+.convertCodeToStruct>.mainContent>.mainContainer>div>span>span {
+    display: inline-block;
+}
+*/
+    
+    .convertCodeToStruct>.mainContent>.mainLogic {
+        background-color: #4C4C4C;
+        width: calc(100% - 2em);
+        padding: 1em;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+        min-height: 35px;
+    }
+    
+    .convertCodeToStruct>.mainContent>.mainLogic>.LogicAccept,
+    .convertCodeToStruct>.mainContent>.mainLogic>.LogicAbort {
+        box-shadow: 0px 4px #b2b2b2;
+        background-color: #e7e7e7;
+        padding: 0.5em;
+        display: inline-block;
+        border-radius: 0px;
+        cursor: pointer;
+        position: relative;
+        float: right;
+        transition: all .1s ease-in;
+        margin-right: 0.25em;
+    }
+    
+    .convertCodeToStruct>.mainContent>.mainLogic>.LogicAccept:hover,
+    .convertCodeToStruct>.mainContent>.mainLogic>.LogicAbort:hover {
+        box-shadow: 0px 2px #b2b2b2;
+        transform: translate(0px, 2px);
+    }
+    
+    .convertCodeToStruct>.mainContent>.mainLogic>.LogicAccept:active,
+    .convertCodeToStruct>.mainContent>.mainLogic>.LogicAbort:active {
+        box-shadow: 0px 0px #b2b2b2;
+        transform: translate(0px, 4px);
+    }
