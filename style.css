@@ -142,7 +142,11 @@ main { flex: 1; display: flex; min-height: 0; }
   background: var(--surface); border-right: 1px solid var(--border); transition: width .2s ease, padding .2s ease;
   overflow: hidden;
 }
-.palette { flex: 1; overflow-y: auto; margin: 0 -4px; padding: 0 4px; }
+.side-scroll {
+  flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+  margin: 0 -6px; padding: 0 6px 4px; scrollbar-width: thin;
+}
+.palette { flex-shrink: 0; }
 .palette h3, .props h3 {
   margin: 14px 4px 6px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
 }
@@ -175,6 +179,9 @@ main { flex: 1; display: flex; min-height: 0; }
 .case-row button:disabled { opacity: .4; cursor: default; }
 .props .small { width: 100%; padding: 6px; margin-top: 2px; color: var(--accent-text); font-weight: 500; }
 .props .small:hover { background: var(--accent-soft); border-color: transparent; }
+.case-heading { font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
+.case-row:last-of-type input { font-style: italic; }
+.props #deleteBtn { width: 100%; margin-top: 10px; }
 
 button.danger {
   border: 1px solid transparent; padding: 9px; border-radius: 8px; font-weight: 600;
@@ -190,7 +197,7 @@ button.danger:disabled { opacity: .45; cursor: default; }
 .collapse span { font-size: 18px; line-height: 1; width: 16px; transition: transform .2s; }
 
 body.collapsed #sidebar { width: 52px; padding: 12px 6px; }
-body.collapsed .palette, body.collapsed .props, body.collapsed #deleteBtn { display: none; }
+body.collapsed .side-scroll { display: none; }
 body.collapsed #sidebar { justify-content: flex-end; }
 body.collapsed .collapse { font-size: 0; justify-content: center; }
 body.collapsed .collapse span { font-size: 18px; transform: rotate(180deg); }
@@ -242,12 +249,18 @@ body.collapsed .collapse span { font-size: 18px; transform: rotate(180deg); }
 /* if / switch */
 .el.if > .head, .el.switch > .head { position: relative; min-height: 3.8em; }
 .head svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-.head svg line { stroke: var(--line); stroke-width: 1; }
+.head svg line, .head svg path { stroke: var(--line); stroke-width: 1; fill: none; }
 .head .cond { text-align: center; padding: 6px 12px 1.7em; position: relative; white-space: pre-wrap; }
 .head .branch {
   position: absolute; bottom: 2px; font-size: 11.5px; padding: 0 5px; min-height: 0; color: var(--muted); font-weight: 500;
 }
 .head .branch:hover { background: none; }
+.el.switch > .head { min-height: 6em; }
+.el.switch > .head .cond { padding-bottom: 3.6em; }
+.el.switch > .head .branch {
+  bottom: 0; padding: 2px 4px 3px; text-align: center; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
 .cols { display: flex; border-top: 1px solid var(--line); }
 .cols > .seq { flex: 1 1 auto; min-width: 96px; }
 .cols > .seq + .seq { border-left: 1px solid var(--line); }
@@ -325,6 +338,18 @@ dialog.info .close:hover { background: var(--hover); color: var(--text); }
 .code-tabs button { border: 0; background: none; padding: 5px 12px; border-radius: 7px; font-weight: 500; color: var(--muted); }
 .code-tabs button:hover { color: var(--text); }
 .code-tabs button.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+
+/* Short windows: compact palette so all elements stay reachable */
+@media (max-height: 640px) {
+  #sidebar { padding-top: 8px; padding-bottom: 6px; gap: 4px; }
+  .palette h3 { margin: 8px 4px 3px; }
+  .tool { padding: 3px 8px; margin-bottom: 1px; }
+  .tool i { width: 24px; height: 24px; }
+  .collapse { padding: 6px 8px; }
+}
+@media (max-height: 460px) {
+  .palette h3 { display: none; }
+}
 
 /* =========================================================
    Small screens

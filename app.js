@@ -198,17 +198,29 @@ function renderNode(node) {
 function decisionHead(text, labels) {
   const head = document.createElement('div');
   head.className = 'head';
-  head.innerHTML = '<svg><line/><line/></svg>';
+  head.innerHTML = '<svg><line/><line/><path/></svg>';
   head.append(label(text, 'cond'));
   labels.forEach((l) => head.append(label(l, 'branch')));
   return head;
 }
 
 /** Columns size to their content, so the diagonals and branch labels are placed
- *  after layout using the real column boundaries. */
+ *  after layout using the real column boundaries.
+ *  If:     two diagonals meeting at the bottom between "wahr" and "falsch".
+ *  Switch: the diagonals meet at the start of the default (last) column, on top of a
+ *          row of case labels; every column divider continues up to the diagonal. */
 function layoutDecisions() {
   document.querySelectorAll('#diagram .if > .head, #diagram .switch > .head').forEach((head) => {
+    const isSwitch = head.parentElement.classList.contains('switch');
     const cols = [...head.nextElementSibling.children];
+    const branches = [...head.querySelectorAll('.branch')];
+
+    // Switch: each case column is at least as wide as its label
+    if (isSwitch) {
+      branches.forEach((b) => { b.style.width = ''; }); // measure natural label width
+      cols.forEach((c, i) => { c.style.minWidth = `${Math.min(branches[i].scrollWidth + 14, 240)}px`; });
+    }
+
     const base = head.getBoundingClientRect();
     const w = base.width;
     const h = base.height;
@@ -216,18 +228,28 @@ function layoutDecisions() {
       const r = c.getBoundingClientRect();
       return { left: r.left - base.left, right: r.right - base.left };
     });
-    // The diagonals meet at the start of the last column (if: between true/false)
     const split = edges[edges.length - 1].left;
-    const [l1, l2] = head.querySelectorAll('line');
-    l1.setAttribute('x1', 0); l1.setAttribute('y1', 0); l1.setAttribute('x2', split); l1.setAttribute('y2', h);
-    l2.setAttribute('x1', split); l2.setAttribute('y1', h); l2.setAttribute('x2', w); l2.setAttribute('y2', 0);
-    // Labels sit in the bottom corner of their column that is below the diagonal:
-    // left-aligned for columns left of the split, right-aligned for the last one.
-    const branches = head.querySelectorAll('.branch');
+    const band = isSwitch ? Math.max(...branches.map((b) => b.offsetHeight)) + 6 : 0;
+    const yMeet = h - band;
+    const lineY = (x) => (x <= split ? (yMeet * x) / split : yMeet * (1 - (x - split) / (w - split)));
+
+    const [l1, l2, dividers] = head.querySelectorAll('line, path');
+    l1.setAttribute('x1', 0); l1.setAttribute('y1', 0); l1.setAttribute('x2', split); l1.setAttribute('y2', yMeet);
+    l2.setAttribute('x1', split); l2.setAttribute('y1', yMeet); l2.setAttribute('x2', w); l2.setAttribute('y2', 0);
+    dividers.setAttribute('d', isSwitch
+      ? edges.slice(1).map((e) => `M${e.left} ${lineY(e.left)}V${h}`).join('')
+      : '');
+
     branches.forEach((b, i) => {
-      const last = i === branches.length - 1;
-      b.style.left = last ? '' : `${edges[i].left}px`;
-      b.style.right = last ? '0' : '';
+      if (isSwitch) {
+        // centered in its own cell of the label row
+        b.style.left = `${edges[i].left}px`;
+        b.style.width = `${edges[i].right - edges[i].left}px`;
+        b.style.right = '';
+      } else {
+        b.style.left = i === 0 ? '0' : '';
+        b.style.right = i === 1 ? '0' : '';
+      }
     });
   });
 }
@@ -322,6 +344,8 @@ function renderProps() {
   $('#deleteBtn').disabled = !hit;
   if (!hit) return;
   const node = hit.node;
+  $('#propTitle').textContent = ELEMENTS[node.type].name;
+  $('#propLabel').textContent = FIELD_LABEL[node.type];
   const text = $('#propText');
   if (document.activeElement !== text) text.value = node.text;
 
@@ -329,18 +353,29 @@ function renderProps() {
   if (node.type !== 'switch') { caseBox.replaceChildren(); return; }
   if (caseBox.contains(document.activeElement)) return;
   caseBox.replaceChildren();
+  const heading = document.createElement('div');
+  heading.className = 'case-heading';
+  heading.textContent = 'Fälle (der letzte ist der Standardfall)';
+  caseBox.append(heading);
   node.cases.forEach((c, i) => {
     const row = document.createElement('div');
     row.className = 'case-row';
     const inp = document.createElement('input');
     inp.value = c.label;
+    inp.placeholder = i === node.cases.length - 1 ? 'sonst' : `Fall ${i + 1}`;
+    inp.setAttribute('aria-label', inp.placeholder);
     const snap = snapshotOnce(inp);
     inp.oninput = () => { snap(); c.label = inp.value; commit(); };
     const rm = document.createElement('button');
     rm.textContent = '−';
     rm.title = 'Fall entfernen';
     rm.disabled = node.cases.length <= 2;
-    rm.onclick = () => { snapshot(); node.cases.splice(i, 1); commit(); };
+    rm.onclick = async () => {
+      if (c.body.length && !await ask(`Fall "${c.label}" mit ${c.body.length} Element(en) entfernen?`, null, 'Entfernen')) return;
+      snapshot();
+      node.cases.splice(i, 1);
+      commit();
+    };
     row.append(inp, rm);
     caseBox.append(row);
   });
@@ -349,11 +384,19 @@ function renderProps() {
   add.textContent = '+ Fall hinzufügen';
   add.onclick = () => {
     snapshot();
-    node.cases.splice(node.cases.length - 1, 0, { label: String(node.cases.length), body: [] });
+    // next free number, inserted before the default case
+    const used = node.cases.map((c) => Number(c.label)).filter(Number.isFinite);
+    const next = used.length ? Math.max(...used) + 1 : node.cases.length;
+    node.cases.splice(node.cases.length - 1, 0, { label: String(next), body: [] });
     commit();
   };
   caseBox.append(add);
 }
+
+const FIELD_LABEL = {
+  while: 'Bedingung', dowhile: 'Bedingung', for: 'Zählbereich', if: 'Bedingung',
+  switch: 'Ausdruck', instruction: 'Anweisung', call: 'Funktionsaufruf',
+};
 
 const snapText = snapshotOnce($('#propText'));
 $('#propText').addEventListener('input', (e) => {
@@ -371,6 +414,7 @@ function select(id) {
   if (id) document.querySelector(`#diagram .el[data-id="${id}"]`)?.classList.add('selected');
   $('#propText').blur();
   renderProps();
+  if (id) $('#props').scrollIntoView({ block: 'nearest' });
 }
 
 /** Insert a new element after the selected one (or at the end) – used without drag & drop. */

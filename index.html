@@ -50,6 +50,7 @@
 
   <main>
     <aside id="sidebar">
+      <div class="side-scroll">
       <div class="palette">
         <h3>Schleifen</h3>
         <div class="tool" draggable="true" data-type="while"><i>↻</i>While-Schleife</div>
@@ -57,19 +58,20 @@
         <div class="tool" draggable="true" data-type="for"><i>#</i>For-Schleife</div>
         <h3>Entscheidungen</h3>
         <div class="tool" draggable="true" data-type="if"><i>?</i>If-Abfrage</div>
-        <div class="tool" draggable="true" data-type="switch"><i>⑃</i>Mehrfachauswahl</div>
+        <div class="tool" draggable="true" data-type="switch"><i><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M8 6 3 10v4M8 6v8M8 6l5 4v4"/></svg></i>Mehrfachauswahl</div>
         <h3>Weitere Elemente</h3>
         <div class="tool" draggable="true" data-type="instruction"><i>=</i>Anweisung</div>
         <div class="tool" draggable="true" data-type="call"><i>ƒ</i>Funktion</div>
       </div>
 
       <div id="props" class="props" hidden>
-        <h3>Element</h3>
-        <label>Text <textarea id="propText" rows="2"></textarea></label>
+        <h3 id="propTitle">Element</h3>
+        <label><span id="propLabel">Text</span> <textarea id="propText" rows="2"></textarea></label>
         <div id="caseProps"></div>
+        <button id="deleteBtn" class="danger" disabled>Element löschen</button>
+      </div>
       </div>
 
-      <button id="deleteBtn" class="danger" disabled>Element löschen</button>
       <button id="collapseBtn" class="collapse"><span>‹</span> Menu verkleinern</button>
     </aside>
 
