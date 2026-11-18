@@ -10,14 +10,14 @@
 const STORAGE_KEY = 'structorizer-v2';
 const $ = (sel) => document.querySelector(sel);
 
-const ELEMENTS = {
-  while:       { name: 'While-Schleife',   text: 'Bedingung',      info: 'Eine While-Schleife wird so lange ausgeführt, wie die Bedingung zutrifft. Die Bedingung wird vor jedem Durchlauf geprüft.', example: 'while (a >= 1) {\n  …\n}' },
-  dowhile:     { name: 'DoWhile-Schleife', text: 'Bedingung',      info: 'Eine DoWhile-Schleife wird mindestens einmal ausgeführt. Die Bedingung wird erst nach jedem Durchlauf geprüft.', example: 'do {\n  …\n} while (a >= 1);' },
-  for:         { name: 'For-Schleife',     text: 'i = 1 bis 10',   info: 'Eine For-Schleife (Zählschleife) wird eine festgelegte Anzahl Male ausgeführt.', example: 'for (int i = 1; i <= 10; i++) {\n  …\n}' },
-  if:          { name: 'If-Abfrage',       text: 'Bedingung',      info: 'Trifft die Bedingung zu, wird der linke (wahr) Zweig ausgeführt, sonst der rechte (falsch).', example: 'if (a > b) {\n  …\n} else {\n  …\n}' },
-  switch:      { name: 'Mehrfachauswahl',  text: 'Variable',       info: 'Abhängig vom Wert einer Variable wird einer von mehreren Fällen ausgeführt. Der letzte Fall ist der Standardfall (sonst).', example: 'switch (x) {\n  case 1: …; break;\n  default: …\n}' },
-  instruction: { name: 'Anweisung',        text: 'Anweisung',      info: 'Eine einfache Anweisung, z.B. eine Zuweisung, Eingabe oder Ausgabe.', example: 'a = a + 1;' },
-  call:        { name: 'Funktion',         text: 'funktion()',     info: 'Ruft eine Funktion (Unterprogramm) auf. Weitere Struktogramme können über das "+" in der Tableiste erstellt werden.', example: 'funktion();' },
+// Code examples are language-neutral; names and descriptions live in i18n.js
+const EXAMPLES = {
+  while: 'while (a >= 1) {\n  …\n}',
+  dowhile: 'do {\n  …\n} while (a >= 1);',
+  for: 'for (int i = 1; i <= 10; i++) {\n  …\n}',
+  if: 'if (a > b) {\n  …\n} else {\n  …\n}',
+  switch: 'switch (x) {\n  case 1: …; break;\n  default: …\n}',
+  instruction: 'a = a + 1;',
 };
 
 let project = null;
@@ -30,10 +30,11 @@ let future = [];
 const uid = () => Math.random().toString(36).slice(2, 10);
 
 function createNode(type) {
-  const n = { id: uid(), type, text: ELEMENTS[type].text };
+  // auto = still the default text, so it follows the selected language
+  const n = { id: uid(), type, text: tr(`el.${type}.text`), auto: true };
   if (['while', 'dowhile', 'for'].includes(type)) n.body = [];
   if (type === 'if') { n.yes = []; n.no = []; }
-  if (type === 'switch') n.cases = [{ label: '1', body: [] }, { label: '2', body: [] }, { label: 'sonst', body: [] }];
+  if (type === 'switch') n.cases = [{ label: '1', body: [] }, { label: '2', body: [] }, { label: tr('case.default'), auto: true, body: [] }];
   return n;
 }
 
@@ -78,6 +79,7 @@ function snapshotOnce(input) {
 }
 
 function commit() {
+  document.title = `${project.title} – Structorizer`;
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(project)); } catch (e) { /* ignore */ }
   render();
 }
@@ -86,6 +88,7 @@ function undo() {
   if (!past.length) return;
   future.push(JSON.stringify(project));
   project = JSON.parse(past.pop());
+  localizeProject(project);
   selectedId = null;
   commit();
 }
@@ -94,21 +97,71 @@ function redo() {
   if (!future.length) return;
   past.push(JSON.stringify(project));
   project = JSON.parse(future.pop());
+  localizeProject(project);
   selectedId = null;
   commit();
 }
 
 function loadProject(p) {
+  localizeProject(p);
   project = p;
   project.active = Math.min(project.active || 0, project.diagrams.length - 1);
   selectedId = null;
   past = []; future = [];
-  document.title = `${project.title} – Structorizer`;
   commit();
 }
 
 function newProject(title) {
-  loadProject({ title: title || 'Struktogramm', active: 0, diagrams: [{ name: title || 'Hauptstruktogramm', body: [] }] });
+  loadProject({
+    title: title || '', auto: !title, active: 0,
+    diagrams: [{ name: title || '', auto: !title, body: [] }],
+  });
+}
+
+/** Put all text the user has not changed into the current language.
+ *  Projects saved before translations existed were German and have no auto flags. */
+function localizeProject(p) {
+  const de = I18N.de;
+  p.auto ??= p.title === de['project.default'];
+  if (p.auto) p.title = tr('project.default');
+  const walk = (list) => list.forEach((n) => {
+    n.auto ??= n.text === de[`el.${n.type}.text`];
+    if (n.auto) n.text = tr(`el.${n.type}.text`);
+    (n.cases || []).forEach((c) => {
+      c.auto ??= c.label === de['case.default'];
+      if (c.auto) c.label = tr('case.default');
+    });
+    childLists(n).forEach(walk);
+  });
+  p.diagrams.forEach((d) => {
+    if (d.auto === undefined) {
+      const fn = /^Funktion (\d+)$/.exec(d.name);
+      d.auto = d.name === de['diagram.main'] || !!fn;
+      if (fn) d.n = Number(fn[1]);
+    }
+    if (d.auto) d.name = d.n ? tr('diagram.function', { n: d.n }) : tr('diagram.main');
+    walk(d.body);
+  });
+}
+
+function setLanguage(code) {
+  lang = code;
+  saveLanguage();
+  applyLanguage();
+  if (project) {
+    localizeProject(project);
+    commit();
+  }
+}
+
+function applyLanguage() {
+  translatePage();
+  $('#langSelect').value = lang;
+  document.querySelectorAll('#langPicker button').forEach((b) => {
+    const active = b.dataset.lang === lang;
+    b.classList.toggle('active', active);
+    b.setAttribute('aria-pressed', active);
+  });
 }
 
 /* ---------------- rendering ---------------- */
@@ -123,7 +176,7 @@ function render() {
   const title = document.createElement('div');
   title.className = 'title';
   title.textContent = d.name;
-  title.title = 'Doppelklick zum Umbenennen';
+  title.title = tr('tab.rename');
   title.ondblclick = () => renameDiagram(project.active);
   const seq = renderSeq(d.body);
   root.append(title, seq);
@@ -181,7 +234,7 @@ function renderNode(node) {
     }
     case 'if':
       el.append(
-        decisionHead(node.text, ['wahr', 'falsch']),
+        decisionHead(node.text, [tr('branch.true'), tr('branch.false')]),
         cols([node.yes, node.no]),
       );
       break;
@@ -274,7 +327,7 @@ function renderTabs() {
     const name = document.createElement('button');
     name.className = 'tab-name';
     name.textContent = d.name;
-    name.title = 'Doppelklick zum Umbenennen';
+    name.title = tr('tab.rename');
     name.onclick = () => {
       if (i === project.active) return; // keep the element so a double click can rename
       project.active = i;
@@ -287,10 +340,10 @@ function renderTabs() {
       const x = document.createElement('button');
       x.className = 'x';
       x.textContent = '×';
-      x.title = `"${d.name}" löschen`;
+      x.title = tr('tab.delete', { name: d.name });
       x.setAttribute('aria-label', x.title);
       x.onclick = async () => {
-        if (!await ask(`"${d.name}" löschen?`, null, 'Löschen')) return;
+        if (!await ask(tr('ask.deleteDiagram', { name: d.name }), null, tr('common.delete'))) return;
         snapshot();
         project.diagrams.splice(i, 1);
         if (project.active >= i) project.active = Math.max(0, project.active - 1);
@@ -325,14 +378,16 @@ function ask(title, value = null, okLabel = 'OK') {
 function message(text) {
   const p = document.createElement('p');
   p.textContent = text;
-  openInfo('Hinweis', p);
+  openInfo(tr('msg.title'), p);
 }
 
 async function renameDiagram(i) {
-  const name = await ask('Name des Struktogramms', project.diagrams[i].name);
-  if (!name) return;
+  const d = project.diagrams[i];
+  const name = await ask(tr('ask.diagramName'), d.name);
+  if (!name || name === d.name) return;
   snapshot();
-  project.diagrams[i].name = name;
+  d.name = name;
+  d.auto = false;
   commit();
 }
 
@@ -344,8 +399,8 @@ function renderProps() {
   $('#deleteBtn').disabled = !hit;
   if (!hit) return;
   const node = hit.node;
-  $('#propTitle').textContent = ELEMENTS[node.type].name;
-  $('#propLabel').textContent = FIELD_LABEL[node.type];
+  $('#propTitle').textContent = tr(`el.${node.type}.name`);
+  $('#propLabel').textContent = tr(`field.${node.type}`);
   const text = $('#propText');
   if (document.activeElement !== text) text.value = node.text;
 
@@ -355,23 +410,23 @@ function renderProps() {
   caseBox.replaceChildren();
   const heading = document.createElement('div');
   heading.className = 'case-heading';
-  heading.textContent = 'Fälle (der letzte ist der Standardfall)';
+  heading.textContent = tr('case.heading');
   caseBox.append(heading);
   node.cases.forEach((c, i) => {
     const row = document.createElement('div');
     row.className = 'case-row';
     const inp = document.createElement('input');
     inp.value = c.label;
-    inp.placeholder = i === node.cases.length - 1 ? 'sonst' : `Fall ${i + 1}`;
+    inp.placeholder = i === node.cases.length - 1 ? tr('case.default') : tr('case.placeholder', { n: i + 1 });
     inp.setAttribute('aria-label', inp.placeholder);
     const snap = snapshotOnce(inp);
-    inp.oninput = () => { snap(); c.label = inp.value; commit(); };
+    inp.oninput = () => { snap(); c.label = inp.value; c.auto = false; commit(); };
     const rm = document.createElement('button');
     rm.textContent = '−';
-    rm.title = 'Fall entfernen';
+    rm.title = tr('case.remove');
     rm.disabled = node.cases.length <= 2;
     rm.onclick = async () => {
-      if (c.body.length && !await ask(`Fall "${c.label}" mit ${c.body.length} Element(en) entfernen?`, null, 'Entfernen')) return;
+      if (c.body.length && !await ask(tr('case.removeAsk', { label: c.label, n: c.body.length }), null, tr('common.remove'))) return;
       snapshot();
       node.cases.splice(i, 1);
       commit();
@@ -381,7 +436,7 @@ function renderProps() {
   });
   const add = document.createElement('button');
   add.className = 'small';
-  add.textContent = '+ Fall hinzufügen';
+  add.textContent = tr('case.add');
   add.onclick = () => {
     snapshot();
     // next free number, inserted before the default case
@@ -393,15 +448,10 @@ function renderProps() {
   caseBox.append(add);
 }
 
-const FIELD_LABEL = {
-  while: 'Bedingung', dowhile: 'Bedingung', for: 'Zählbereich', if: 'Bedingung',
-  switch: 'Ausdruck', instruction: 'Anweisung', call: 'Funktionsaufruf',
-};
-
 const snapText = snapshotOnce($('#propText'));
 $('#propText').addEventListener('input', (e) => {
   const hit = find(selectedId);
-  if (hit) { snapText(); hit.node.text = e.target.value; commit(); }
+  if (hit) { snapText(); hit.node.text = e.target.value; hit.node.auto = false; commit(); }
 });
 
 /* ---------------- selection & deletion ---------------- */
@@ -551,7 +601,7 @@ document.addEventListener('dragend', endDrag);
 /* ---------------- code export ---------------- */
 
 const lines = (t) => (t || '').split('\n').filter((l) => l.trim());
-const isDefault = (l) => /^(sonst|default|else|_)$/i.test(l.trim());
+const isDefault = (c) => c.auto || /^(sonst|default|else|otherwise|sinon|altrimenti|_)$/i.test(c.label.trim());
 
 function toJava(list, ind) {
   const p = '    '.repeat(ind);
@@ -572,9 +622,9 @@ function toJava(list, ind) {
       case 'switch':
         out += `${p}switch (${n.text}) {\n`;
         n.cases.forEach((c) => {
-          out += isDefault(c.label) ? `${p}    default:\n` : `${p}    case ${c.label}:\n`;
+          out += isDefault(c) ? `${p}    default:\n` : `${p}    case ${c.label}:\n`;
           out += toJava(c.body, ind + 2);
-          if (!isDefault(c.label)) out += `${p}        break;\n`;
+          if (!isDefault(c)) out += `${p}        break;\n`;
         });
         out += `${p}}\n`;
         break;
@@ -605,7 +655,7 @@ function toPython(list, ind) {
       case 'switch':
         out += `${p}match ${n.text}:\n`;
         n.cases.forEach((c) => {
-          out += `${p}    case ${isDefault(c.label) ? '_' : c.label}:\n${toPython(c.body, ind + 2)}`;
+          out += `${p}    case ${isDefault(c) ? '_' : c.label}:\n${toPython(c.body, ind + 2)}`;
         });
         break;
     }
@@ -642,12 +692,12 @@ function showCode() {
     tabs.append(b);
   });
   const copy = document.createElement('button');
-  copy.textContent = 'Kopieren';
-  copy.onclick = () => navigator.clipboard?.writeText(pre.textContent).then(() => { copy.textContent = 'Kopiert ✓'; });
+  copy.textContent = tr('code.copy');
+  copy.onclick = () => navigator.clipboard?.writeText(pre.textContent).then(() => { copy.textContent = tr('code.copied'); });
   tabs.append(copy);
   body.append(tabs, pre);
   show('java');
-  openInfo('Code exportieren', body);
+  openInfo(tr('action.code'), body);
 }
 
 /* ---------------- files & image ---------------- */
@@ -676,12 +726,12 @@ $('#fileInput').addEventListener('change', async (e) => {
     $('#startDialog').close();
     loadProject(p);
   } catch (err) {
-    message('Diese Datei konnte nicht gelesen werden.');
+    message(tr('msg.badFile'));
   }
 });
 
 async function exportImage() {
-  if (!window.html2canvas) { message('Bildexport konnte nicht geladen werden.'); return; }
+  if (!window.html2canvas) { message(tr('msg.imageFailed')); return; }
   const prev = selectedId;
   selectedId = null;
   render();
@@ -707,33 +757,29 @@ $('#infoDialog [data-close]').onclick = () => $('#infoDialog').close();
 $('#infoDialog').addEventListener('click', (e) => { if (e.target.id === 'infoDialog') e.target.close(); });
 
 function showElementInfo(type) {
-  const t = ELEMENTS[type];
   const div = document.createElement('div');
-  div.innerHTML = `<p><b></b></p><p></p><div>Code Beispiel:</div><pre></pre>
-    <p class="hint">Tipp: Element in das Struktogramm ziehen – oder hier einfügen
-    (nach dem ausgewählten Element, sonst am Ende).</p>
-    <button class="insert-btn">Einfügen</button>`;
-  div.querySelector('b').textContent = t.name + ':';
-  div.querySelectorAll('p')[1].textContent = t.info;
-  div.querySelector('pre').textContent = t.example;
-  div.querySelector('.insert-btn').onclick = () => { $('#infoDialog').close(); insertNode(type); };
-  openInfo('Information', div);
+  div.innerHTML = `<p><b></b></p><p></p><div></div><pre></pre>
+    <p class="hint"></p><button class="insert-btn"></button>`;
+  const [name, info, hint] = div.querySelectorAll('b, p:nth-of-type(2), .hint');
+  name.textContent = `${tr(`el.${type}.name`)}:`;
+  info.textContent = tr(`el.${type}.info`);
+  hint.textContent = tr('info.tip');
+  div.querySelector('div').textContent = tr('info.example');
+  div.querySelector('pre').textContent = EXAMPLES[type] || `${tr('el.call.text')};`;
+  const insert = div.querySelector('.insert-btn');
+  insert.textContent = tr('info.insert');
+  insert.onclick = () => { $('#infoDialog').close(); insertNode(type); };
+  openInfo(tr('info.title'), div);
 }
 
 function showHelp() {
   const div = document.createElement('div');
+  const items = ['drag', 'select', 'move', 'keys', 'tabs', 'save'].map((k) => `<li>${tr(`help.${k}`)}</li>`).join('');
   div.innerHTML = `
-    <p><b>Structorizer v2</b> – Struktogramme (Nassi-Shneiderman-Diagramme) im Browser erstellen.</p>
-    <ul>
-      <li>Elemente aus der linken Leiste in das Struktogramm <b>ziehen</b>.</li>
-      <li>Element anklicken zum Auswählen, <b>Doppelklick</b> zum Bearbeiten des Textes.</li>
-      <li>Bestehende Elemente können per Drag &amp; Drop verschoben werden.</li>
-      <li><kbd>Entf</kbd> löscht das ausgewählte Element, <kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd> für Rückgängig / Wiederholen.</li>
-      <li>Mit <b>+</b> in der Tableiste weitere Struktogramme (Funktionen) anlegen.</li>
-      <li>Das Projekt wird automatisch im Browser gespeichert. Über <i>Datei → Download</i> kann es als Datei gesichert werden.</li>
-    </ul>
-    <p><a href="https://janishuser.github.io/Structorizer/legacy/struct.html" target="_blank" rel="noopener">Alte Version öffnen</a></p>`;
-  openInfo('Info', div);
+    <p>${tr('help.intro')}</p>
+    <ul>${items}</ul>
+    <p><a href="https://janishuser.github.io/Structorizer/legacy/struct.html" target="_blank" rel="noopener">${tr('help.old')}</a></p>`;
+  openInfo(tr('help.title'), div);
 }
 
 /* start dialog */
@@ -753,9 +799,24 @@ $('#lastBtn').onclick = () => {
   try {
     loadProject(JSON.parse(localStorage.getItem(STORAGE_KEY)));
     $('#startDialog').close();
-  } catch (e) { message('Das letzte Projekt konnte nicht geladen werden.'); }
+  } catch (e) { message(tr('msg.lastFailed')); }
 };
-$('#startDialog').addEventListener('close', () => { if (!project) newProject('Hauptstruktogramm'); });
+$('#startDialog').addEventListener('close', () => {
+  saveLanguage(); // the language shown when starting is the chosen one
+  if (!project) newProject();
+});
+
+/* language choice: buttons in the start dialog, dropdown in the menu bar */
+Object.entries(LANGS).forEach(([code, name]) => {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.textContent = name;
+  b.dataset.lang = code;
+  b.onclick = () => setLanguage(code);
+  $('#langPicker').append(b);
+  $('#langSelect').add(new Option(name, code));
+});
+$('#langSelect').onchange = (e) => setLanguage(e.target.value);
 
 /* ---------------- menus, tabs & shortcuts ---------------- */
 
@@ -788,10 +849,12 @@ document.addEventListener('click', () => document.querySelectorAll('.menu.open')
 document.querySelectorAll('[data-action]').forEach((b) => { b.onclick = () => actions[b.dataset.action](); });
 
 $('#addTab').onclick = async () => {
-  const name = await ask('Name der Funktion', `Funktion ${project.diagrams.length}`);
+  const n = project.diagrams.length;
+  const suggested = tr('diagram.function', { n });
+  const name = await ask(tr('ask.functionName'), suggested);
   if (!name) return;
   snapshot();
-  project.diagrams.push({ name, body: [] });
+  project.diagrams.push(name === suggested ? { name, auto: true, n, body: [] } : { name, auto: false, body: [] });
   project.active = project.diagrams.length - 1;
   selectedId = null;
   commit();
@@ -800,7 +863,7 @@ $('#addTab').onclick = async () => {
 $('#collapseBtn').onclick = () => document.body.classList.toggle('collapsed');
 
 document.addEventListener('keydown', (e) => {
-  const typing = /INPUT|TEXTAREA/.test(document.activeElement.tagName);
+  const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
   const dialogOpen = document.querySelector('dialog[open]');
   const mod = e.ctrlKey || e.metaKey;
   if (mod && e.key.toLowerCase() === 's') { e.preventDefault(); if (project) saveFile(); return; }
@@ -813,4 +876,5 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ---------------- boot ---------------- */
+applyLanguage();
 showStart();

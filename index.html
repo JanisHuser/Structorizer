@@ -8,71 +8,72 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
   <!-- Menu bar -->
   <nav class="menubar">
     <div class="brand"><span class="logo"></span>Structorizer</div>
     <div class="menu">
-      <span class="menu-title">Datei</span>
+      <span class="menu-title" data-i18n="menu.file">Datei</span>
       <div class="menu-items">
-        <button data-action="new">Neues Projekt</button>
-        <button data-action="open">Projekt/Datei öffnen <kbd>Ctrl+O</kbd></button>
-        <button data-action="save">Download <kbd>Ctrl+S</kbd></button>
+        <button data-action="new" data-i18n="action.new">Neues Projekt</button>
+        <button data-action="open"><span data-i18n="action.open">Projekt/Datei öffnen</span> <kbd>Ctrl+O</kbd></button>
+        <button data-action="save"><span data-i18n="action.save">Download</span> <kbd>Ctrl+S</kbd></button>
         <hr>
-        <button data-action="code">Code exportieren</button>
-        <button data-action="image">Bild erstellen</button>
+        <button data-action="code" data-i18n="action.code">Code exportieren</button>
+        <button data-action="image" data-i18n="action.image">Bild erstellen</button>
       </div>
     </div>
     <div class="menu">
-      <span class="menu-title">Bearbeiten</span>
+      <span class="menu-title" data-i18n="menu.edit">Bearbeiten</span>
       <div class="menu-items">
-        <button data-action="undo">Rückgängig <kbd>Ctrl+Z</kbd></button>
-        <button data-action="redo">Wiederholen <kbd>Ctrl+Y</kbd></button>
+        <button data-action="undo"><span data-i18n="action.undo">Rückgängig</span> <kbd>Ctrl+Z</kbd></button>
+        <button data-action="redo"><span data-i18n="action.redo">Wiederholen</span> <kbd>Ctrl+Y</kbd></button>
         <hr>
-        <button data-action="delete">Element löschen <kbd>Entf</kbd></button>
+        <button data-action="delete"><span data-i18n="action.delete">Element löschen</span> <kbd data-i18n="key.delete">Entf</kbd></button>
       </div>
     </div>
     <div class="menu">
-      <span class="menu-title">Hilfe</span>
+      <span class="menu-title" data-i18n="menu.help">Hilfe</span>
       <div class="menu-items">
-        <button data-action="info">Info</button>
+        <button data-action="info" data-i18n="action.info">Info</button>
       </div>
     </div>
+    <select id="langSelect" data-i18n-title="language"></select>
   </nav>
 
   <!-- Tabs -->
   <div class="tabbar">
     <div id="tabs"></div>
-    <button id="addTab" title="Neues Struktogramm">+</button>
+    <button id="addTab" data-i18n-title="tab.add">+</button>
   </div>
 
   <main>
     <aside id="sidebar">
       <div class="side-scroll">
       <div class="palette">
-        <h3>Schleifen</h3>
-        <div class="tool" draggable="true" data-type="while"><i>↻</i>While-Schleife</div>
-        <div class="tool" draggable="true" data-type="dowhile"><i>↺</i>DoWhile-Schleife</div>
-        <div class="tool" draggable="true" data-type="for"><i>#</i>For-Schleife</div>
-        <h3>Entscheidungen</h3>
-        <div class="tool" draggable="true" data-type="if"><i>?</i>If-Abfrage</div>
-        <div class="tool" draggable="true" data-type="switch"><i><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M8 6 3 10v4M8 6v8M8 6l5 4v4"/></svg></i>Mehrfachauswahl</div>
-        <h3>Weitere Elemente</h3>
-        <div class="tool" draggable="true" data-type="instruction"><i>=</i>Anweisung</div>
-        <div class="tool" draggable="true" data-type="call"><i>ƒ</i>Funktion</div>
+        <h3 data-i18n="palette.loops">Schleifen</h3>
+        <div class="tool" draggable="true" data-type="while"><i>↻</i><span data-i18n="el.while.name">While-Schleife</span></div>
+        <div class="tool" draggable="true" data-type="dowhile"><i>↺</i><span data-i18n="el.dowhile.name">DoWhile-Schleife</span></div>
+        <div class="tool" draggable="true" data-type="for"><i>#</i><span data-i18n="el.for.name">For-Schleife</span></div>
+        <h3 data-i18n="palette.decisions">Entscheidungen</h3>
+        <div class="tool" draggable="true" data-type="if"><i>?</i><span data-i18n="el.if.name">If-Abfrage</span></div>
+        <div class="tool" draggable="true" data-type="switch"><i><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M8 6 3 10v4M8 6v8M8 6l5 4v4"/></svg></i><span data-i18n="el.switch.name">Mehrfachauswahl</span></div>
+        <h3 data-i18n="palette.other">Weitere Elemente</h3>
+        <div class="tool" draggable="true" data-type="instruction"><i>=</i><span data-i18n="el.instruction.name">Anweisung</span></div>
+        <div class="tool" draggable="true" data-type="call"><i>ƒ</i><span data-i18n="el.call.name">Funktion</span></div>
       </div>
 
       <div id="props" class="props" hidden>
         <h3 id="propTitle">Element</h3>
         <label><span id="propLabel">Text</span> <textarea id="propText" rows="2"></textarea></label>
         <div id="caseProps"></div>
-        <button id="deleteBtn" class="danger" disabled>Element löschen</button>
+        <button id="deleteBtn" class="danger" data-i18n="action.delete" disabled>Element löschen</button>
       </div>
       </div>
 
-      <button id="collapseBtn" class="collapse"><span>‹</span> Menu verkleinern</button>
+      <button id="collapseBtn" class="collapse"><span class="arrow">‹</span> <span data-i18n="sidebar.collapse">Menu verkleinern</span></button>
     </aside>
 
     <section id="canvas">
@@ -82,17 +83,19 @@
 
   <!-- Start dialog -->
   <dialog id="startDialog">
-    <h4>Neues Projekt erstellen:</h4>
-    <input id="newTitle" placeholder="Projekttitel">
-    <button id="createBtn" disabled>Projekt erstellen</button>
-    <h4>Projekt aus Datei öffnen:</h4>
-    <button id="openBtn">Datei auswählen…</button>
-    <button id="lastBtn" class="primary">Zuletzt bearbeitetes Projekt laden</button>
+    <h4 data-i18n="language">Sprache</h4>
+    <div id="langPicker" class="lang-picker"></div>
+    <h4 data-i18n="start.new">Neues Projekt erstellen:</h4>
+    <input id="newTitle" data-i18n-placeholder="start.title" placeholder="Projekttitel">
+    <button id="createBtn" data-i18n="start.create" disabled>Projekt erstellen</button>
+    <h4 data-i18n="start.open">Projekt aus Datei öffnen:</h4>
+    <button id="openBtn" data-i18n="start.choose">Datei auswählen…</button>
+    <button id="lastBtn" class="primary" data-i18n="start.last">Zuletzt bearbeitetes Projekt laden</button>
   </dialog>
 
   <!-- Generic info / code dialog -->
   <dialog id="infoDialog" class="info">
-    <header><span id="infoTitle">Information</span><button class="close" data-close>×</button></header>
+    <header><span id="infoTitle">Information</span><button class="close" data-close data-i18n-title="common.close">×</button></header>
     <div id="infoBody"></div>
   </dialog>
 
@@ -104,7 +107,7 @@
       <!-- OK comes first so that Enter submits it (shown on the right via row-reverse) -->
       <div class="ask-actions">
         <button value="ok" class="primary" id="askOk">OK</button>
-        <button value="cancel" formnovalidate>Abbrechen</button>
+        <button value="cancel" formnovalidate data-i18n="common.cancel">Abbrechen</button>
       </div>
     </form>
   </dialog>
@@ -112,6 +115,7 @@
   <input type="file" id="fileInput" accept=".json,.struct" hidden>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
-  <script src="app.js?v=3"></script>
+  <script src="i18n.js?v=4"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>

@@ -105,6 +105,12 @@ kbd { font-family: inherit; }
 
 @keyframes pop { from { opacity: 0; transform: translateY(-4px) scale(.98); } }
 
+#langSelect {
+  margin-left: auto; max-width: 112px; padding: 5px 6px; font: inherit; font-size: 13px; color: var(--muted);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 7px; cursor: pointer;
+}
+#langSelect:hover { color: var(--text); background: var(--hover); }
+
 /* =========================================================
    Tabs
    ========================================================= */
@@ -194,13 +200,13 @@ button.danger:disabled { opacity: .45; cursor: default; }
   color: var(--muted); font-weight: 500; white-space: nowrap;
 }
 .collapse:hover { background: var(--hover); color: var(--text); }
-.collapse span { font-size: 18px; line-height: 1; width: 16px; transition: transform .2s; }
+.collapse .arrow { font-size: 18px; line-height: 1; width: 16px; transition: transform .2s; }
 
 body.collapsed #sidebar { width: 52px; padding: 12px 6px; }
 body.collapsed .side-scroll { display: none; }
 body.collapsed #sidebar { justify-content: flex-end; }
 body.collapsed .collapse { font-size: 0; justify-content: center; }
-body.collapsed .collapse span { font-size: 18px; transform: rotate(180deg); }
+body.collapsed .collapse .arrow { font-size: 18px; transform: rotate(180deg); }
 
 /* =========================================================
    Canvas
@@ -294,6 +300,10 @@ dialog::backdrop { background: rgba(15, 17, 21, .35); backdrop-filter: blur(4px)
 }
 #startDialog button:not(:disabled):hover { background: var(--hover); }
 #startDialog button:disabled { color: var(--muted); opacity: .6; cursor: default; }
+#startDialog .lang-picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+#startDialog .lang-picker button { width: auto; margin: 0; padding: 7px 2px; font-size: 12.5px; font-weight: 500; }
+#startDialog .lang-picker button.active,
+#startDialog .lang-picker button.active:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
 #createBtn:not(:disabled), #startDialog button.primary:not(:disabled) { background: var(--accent); border-color: var(--accent); color: #fff; }
 #createBtn:not(:disabled):hover, #startDialog button.primary:not(:disabled):hover { background: var(--accent); filter: brightness(1.08); }
 #startDialog button.primary { margin: 0; }

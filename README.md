@@ -3,7 +3,7 @@
 Create structograms (Nassi-Shneiderman diagrams) in the browser. New version (v2). The
 [old version](https://janishuser.github.io/Structorizer/legacy/struct.html) is still available under `legacy/`.
 
-Plain HTML/CSS/JavaScript with no build step: `index.html`, `style.css`, `app.js`.
+Plain HTML/CSS/JavaScript with no build step: `index.html`, `style.css`, `i18n.js`, `app.js`.
 
 ## Features
 
@@ -12,6 +12,7 @@ Plain HTML/CSS/JavaScript with no build step: `index.html`, `style.css`, `app.js
 - Multiple diagrams per project (tabs), e.g. for functions
 - Undo/redo, autosave to localStorage, download/open project files (`.struct`, JSON)
 - Export as Java/C-style code or Python, and as a PNG image
+- German, English, French and Italian UI: chosen at startup, remembered in a cookie (add languages in `i18n.js`)
 
 ## Run locally
 
