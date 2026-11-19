@@ -320,6 +320,12 @@ dialog::backdrop { background: rgba(15, 17, 21, .35); backdrop-filter: blur(4px)
 .ask-actions button:hover { background: var(--hover); }
 .ask-actions .primary, .ask-actions .primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 
+#consentDialog { width: min(420px, calc(100vw - 32px)); padding: 22px; }
+#consentDialog h4 { margin: 0 0 10px; font-size: 16px; }
+#consentDialog p { margin: 0 0 10px; line-height: 1.55; font-size: 13.5px; }
+#consentDialog a { color: var(--accent-text); }
+#consentDialog .ask-actions button { min-width: 110px; }
+
 dialog.info { width: min(660px, calc(100vw - 32px)); padding: 0; overflow: hidden; }
 dialog.info header {
   display: flex; justify-content: space-between; align-items: center; padding: 16px 20px 0; font-weight: 700; font-size: 17px;

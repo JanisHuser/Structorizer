@@ -57,6 +57,16 @@ const I18N = {
     'el.call.info': 'Ruft eine Funktion (Unterprogramm) auf. Weitere Struktogramme können über das "+" in der Tableiste erstellt werden.',
     'field.while': 'Bedingung', 'field.dowhile': 'Bedingung', 'field.for': 'Zählbereich', 'field.if': 'Bedingung',
     'field.switch': 'Ausdruck', 'field.instruction': 'Anweisung', 'field.call': 'Funktionsaufruf',
+    'action.privacy': 'Datenschutz',
+    'consent.title': 'Cookies & Statistik',
+    'consent.text': 'Structorizer möchte mit Google Analytics anonym messen, wie die Seite genutzt wird (z.B. welche Funktionen verwendet werden). Dafür werden Cookies gesetzt. Deine Struktogramme werden nie übertragen.',
+    'consent.more': 'Mehr dazu', 'consent.accept': 'Akzeptieren', 'consent.decline': 'Ablehnen',
+    'privacy.title': 'Datenschutz',
+    'privacy.local': '<b>Im Browser gespeichert:</b> Dein Projekt (localStorage), die gewählte Sprache (Cookie) und deine Cookie-Entscheidung. Diese Daten verlassen deinen Computer nicht.',
+    'privacy.ga': '<b>Google Analytics</b> (Google Ireland Ltd. / Google LLC, USA) wird nur mit deiner Zustimmung geladen. Erfasst werden Seitenaufrufe, ungefährer Standort, Gerät/Browser und welche Funktionen genutzt werden (z.B. Code- oder Bildexport) – nicht der Inhalt deiner Struktogramme.',
+    'privacy.third': '<b>Externe Dienste:</b> Schriften werden von Google Fonts, der Bildexport von cdnjs (Cloudflare) geladen. Dabei wird deine IP-Adresse an diese Anbieter übermittelt. Die Seite wird von GitHub Pages gehostet.',
+    'privacy.status.granted': 'Statistik ist <b>aktiviert</b>.', 'privacy.status.denied': 'Statistik ist <b>deaktiviert</b>.',
+    'privacy.enable': 'Statistik erlauben', 'privacy.disable': 'Statistik deaktivieren',
   },
 
   en: {
@@ -108,6 +118,16 @@ const I18N = {
     'el.call.info': 'Calls a function (subroutine). More diagrams can be added with the "+" in the tab bar.',
     'field.while': 'Condition', 'field.dowhile': 'Condition', 'field.for': 'Range', 'field.if': 'Condition',
     'field.switch': 'Expression', 'field.instruction': 'Statement', 'field.call': 'Function call',
+    'action.privacy': 'Privacy',
+    'consent.title': 'Cookies & statistics',
+    'consent.text': 'Structorizer would like to use Google Analytics to measure anonymously how the site is used (e.g. which features are used). This sets cookies. Your diagrams are never sent anywhere.',
+    'consent.more': 'Learn more', 'consent.accept': 'Accept', 'consent.decline': 'Decline',
+    'privacy.title': 'Privacy',
+    'privacy.local': '<b>Stored in your browser:</b> your project (localStorage), the chosen language (cookie) and your cookie choice. This data never leaves your computer.',
+    'privacy.ga': '<b>Google Analytics</b> (Google Ireland Ltd. / Google LLC, USA) is only loaded with your consent. It records page views, approximate location, device/browser and which features are used (e.g. code or image export) – not the content of your diagrams.',
+    'privacy.third': '<b>External services:</b> fonts are loaded from Google Fonts and the image export from cdnjs (Cloudflare), which transmits your IP address to these providers. The site is hosted on GitHub Pages.',
+    'privacy.status.granted': 'Statistics are <b>enabled</b>.', 'privacy.status.denied': 'Statistics are <b>disabled</b>.',
+    'privacy.enable': 'Allow statistics', 'privacy.disable': 'Disable statistics',
   },
 
   fr: {
@@ -159,6 +179,16 @@ const I18N = {
     'el.call.info': "Appelle une fonction (sous-programme). D'autres structogrammes peuvent être ajoutés avec le « + » de la barre d'onglets.",
     'field.while': 'Condition', 'field.dowhile': 'Condition', 'field.for': 'Plage', 'field.if': 'Condition',
     'field.switch': 'Expression', 'field.instruction': 'Instruction', 'field.call': 'Appel de fonction',
+    'action.privacy': 'Confidentialité',
+    'consent.title': 'Cookies et statistiques',
+    'consent.text': "Structorizer souhaite mesurer de manière anonyme avec Google Analytics comment le site est utilisé (p. ex. quelles fonctions sont utilisées). Des cookies sont alors enregistrés. Tes structogrammes ne sont jamais transmis.",
+    'consent.more': 'En savoir plus', 'consent.accept': 'Accepter', 'consent.decline': 'Refuser',
+    'privacy.title': 'Confidentialité',
+    'privacy.local': "<b>Enregistré dans le navigateur :</b> ton projet (localStorage), la langue choisie (cookie) et ton choix concernant les cookies. Ces données ne quittent pas ton ordinateur.",
+    'privacy.ga': "<b>Google Analytics</b> (Google Ireland Ltd. / Google LLC, États-Unis) n'est chargé qu'avec ton accord. Sont enregistrés les pages vues, la localisation approximative, l'appareil/le navigateur et les fonctions utilisées (p. ex. export de code ou d'image) – jamais le contenu de tes structogrammes.",
+    'privacy.third': "<b>Services externes :</b> les polices sont chargées depuis Google Fonts et l'export d'image depuis cdnjs (Cloudflare), ce qui transmet ton adresse IP à ces fournisseurs. Le site est hébergé sur GitHub Pages.",
+    'privacy.status.granted': 'Les statistiques sont <b>activées</b>.', 'privacy.status.denied': 'Les statistiques sont <b>désactivées</b>.',
+    'privacy.enable': 'Autoriser les statistiques', 'privacy.disable': 'Désactiver les statistiques',
   },
 
   it: {
@@ -210,6 +240,16 @@ const I18N = {
     'el.call.info': 'Richiama una funzione (sottoprogramma). Altri strutturogrammi possono essere aggiunti con il "+" nella barra delle schede.',
     'field.while': 'Condizione', 'field.dowhile': 'Condizione', 'field.for': 'Intervallo', 'field.if': 'Condizione',
     'field.switch': 'Espressione', 'field.instruction': 'Istruzione', 'field.call': 'Chiamata di funzione',
+    'action.privacy': 'Privacy',
+    'consent.title': 'Cookie e statistiche',
+    'consent.text': "Structorizer vorrebbe usare Google Analytics per misurare in forma anonima come viene utilizzato il sito (ad es. quali funzioni vengono usate). A tale scopo vengono impostati dei cookie. I tuoi strutturogrammi non vengono mai trasmessi.",
+    'consent.more': 'Maggiori informazioni', 'consent.accept': 'Accetta', 'consent.decline': 'Rifiuta',
+    'privacy.title': 'Privacy',
+    'privacy.local': "<b>Salvato nel browser:</b> il tuo progetto (localStorage), la lingua scelta (cookie) e la tua scelta sui cookie. Questi dati non lasciano il tuo computer.",
+    'privacy.ga': "<b>Google Analytics</b> (Google Ireland Ltd. / Google LLC, USA) viene caricato solo con il tuo consenso. Registra le pagine visitate, la posizione approssimativa, dispositivo/browser e le funzioni utilizzate (ad es. esportazione di codice o immagini) – mai il contenuto dei tuoi strutturogrammi.",
+    'privacy.third': "<b>Servizi esterni:</b> i caratteri vengono caricati da Google Fonts e l'esportazione di immagini da cdnjs (Cloudflare); in questo modo il tuo indirizzo IP viene trasmesso a questi fornitori. Il sito è ospitato su GitHub Pages.",
+    'privacy.status.granted': 'Le statistiche sono <b>attive</b>.', 'privacy.status.denied': 'Le statistiche sono <b>disattivate</b>.',
+    'privacy.enable': 'Consenti statistiche', 'privacy.disable': 'Disattiva statistiche',
   },
 };
 
@@ -220,14 +260,10 @@ function savedLanguage() {
   return match && LANGS[match[1]] ? match[1] : null;
 }
 
-function browserLanguage() {
-  const found = (navigator.languages || [navigator.language])
-    .map((l) => String(l).slice(0, 2).toLowerCase())
-    .find((l) => LANGS[l]);
-  return found || 'en';
-}
+// English unless the visitor has picked another language (start dialog or menu)
+const DEFAULT_LANG = 'en';
 
-let lang = savedLanguage() || browserLanguage();
+let lang = savedLanguage() || DEFAULT_LANG;
 
 function saveLanguage() {
   const path = location.pathname.replace(/[^/]*$/, '');

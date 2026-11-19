@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,7 +8,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
+  <!-- Google Analytics with Consent Mode v2: nothing is loaded or stored until the visitor agrees (see consent in app.js) -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {
+      analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied',
+    });
+    gtag('js', new Date());
+  </script>
 </head>
 <body>
   <!-- Menu bar -->
@@ -38,6 +47,7 @@
       <span class="menu-title" data-i18n="menu.help">Hilfe</span>
       <div class="menu-items">
         <button data-action="info" data-i18n="action.info">Info</button>
+        <button data-action="privacy" data-i18n="action.privacy">Datenschutz</button>
       </div>
     </div>
     <select id="langSelect" data-i18n-title="language"></select>
@@ -93,6 +103,17 @@
     <button id="lastBtn" class="primary" data-i18n="start.last">Zuletzt bearbeitetes Projekt laden</button>
   </dialog>
 
+  <!-- Cookie consent (shown once, before the start dialog) -->
+  <dialog id="consentDialog" closedby="none">
+    <h4 data-i18n="consent.title">Cookies &amp; Statistik</h4>
+    <p data-i18n="consent.text"></p>
+    <p><a href="#" id="consentMore" data-i18n="consent.more">Mehr dazu</a></p>
+    <div class="ask-actions">
+      <button id="consentAccept" class="primary" data-i18n="consent.accept">Akzeptieren</button>
+      <button id="consentDecline" data-i18n="consent.decline">Ablehnen</button>
+    </div>
+  </dialog>
+
   <!-- Generic info / code dialog -->
   <dialog id="infoDialog" class="info">
     <header><span id="infoTitle">Information</span><button class="close" data-close data-i18n-title="common.close">×</button></header>
@@ -115,7 +136,7 @@
   <input type="file" id="fileInput" accept=".json,.struct" hidden>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
-  <script src="i18n.js?v=4"></script>
-  <script src="app.js?v=4"></script>
+  <script src="i18n.js?v=5"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

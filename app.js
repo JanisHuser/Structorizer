@@ -10,6 +10,54 @@
 const STORAGE_KEY = 'structorizer-v2';
 const $ = (sel) => document.querySelector(sel);
 
+/* ---------------- analytics & consent ----------------
+   Google Analytics is only downloaded once the visitor accepts (gtag + consent
+   defaults are set up in index.html). Until then nothing is sent or stored. */
+
+const GA_ID = 'G-J8R18F1LH0';
+const CONSENT_KEY = 'structorizer-consent';
+
+let consent = null; // 'granted' | 'denied' | null (not asked yet)
+try { consent = localStorage.getItem(CONSENT_KEY); } catch (e) { /* storage blocked */ }
+if (consent !== 'granted' && consent !== 'denied') consent = null;
+
+let gaLoaded = false;
+
+function applyConsent() {
+  const granted = consent === 'granted';
+  gtag('consent', 'update', { analytics_storage: granted ? 'granted' : 'denied' });
+  if (granted && !gaLoaded) {
+    gaLoaded = true;
+    gtag('config', GA_ID);
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+    document.head.append(s);
+  }
+}
+
+/** Remove Google Analytics cookies after consent is withdrawn. */
+function deleteGaCookies() {
+  document.cookie.split('; ').map((c) => c.split('=')[0]).filter((n) => n.startsWith('_ga')).forEach((name) => {
+    const expired = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+    document.cookie = expired;
+    document.cookie = `${expired}; domain=${location.hostname}`;
+    document.cookie = `${expired}; domain=.${location.hostname}`;
+  });
+}
+
+function setConsent(granted) {
+  consent = granted ? 'granted' : 'denied';
+  try { localStorage.setItem(CONSENT_KEY, consent); } catch (e) { /* ignore */ }
+  applyConsent();
+  if (!granted) deleteGaCookies();
+}
+
+/** Send a usage event (only with consent). */
+function track(name, params = {}) {
+  if (consent === 'granted') gtag('event', name, params);
+}
+
 // Code examples are language-neutral; names and descriptions live in i18n.js
 const EXAMPLES = {
   while: 'while (a >= 1) {\n  …\n}',
@@ -145,6 +193,7 @@ function localizeProject(p) {
 }
 
 function setLanguage(code) {
+  if (code !== lang) track('language_change', { ui_language: code });
   lang = code;
   saveLanguage();
   applyLanguage();
@@ -476,6 +525,7 @@ function insertNode(type) {
   else diagram().body.push(node);
   selectedId = node.id;
   commit();
+  track('element_add', { element_type: type, method: 'button' });
 }
 
 function deleteSelected() {
@@ -577,6 +627,7 @@ $('#diagram').addEventListener('drop', (e) => {
   let node;
   if (dragData.type) {
     node = createNode(dragData.type);
+    track('element_add', { element_type: dragData.type, method: 'drag' });
   } else {
     const src = find(dragData.id);
     node = src.node;
@@ -680,7 +731,10 @@ function showCode() {
   tabs.className = 'code-tabs';
   const pre = document.createElement('pre');
   const langs = { java: 'Java / C', python: 'Python' };
+  let current = 'java';
   const show = (lang) => {
+    current = lang;
+    track('code_export', { code_language: lang });
     pre.textContent = generate(lang);
     tabs.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.dataset.lang === lang));
   };
@@ -693,7 +747,10 @@ function showCode() {
   });
   const copy = document.createElement('button');
   copy.textContent = tr('code.copy');
-  copy.onclick = () => navigator.clipboard?.writeText(pre.textContent).then(() => { copy.textContent = tr('code.copied'); });
+  copy.onclick = () => {
+    track('code_copy', { code_language: current });
+    navigator.clipboard?.writeText(pre.textContent).then(() => { copy.textContent = tr('code.copied'); });
+  };
   tabs.append(copy);
   body.append(tabs, pre);
   show('java');
@@ -713,6 +770,7 @@ function download(blob, filename) {
 function saveFile() {
   const data = JSON.stringify({ app: 'structorizer', version: 2, project }, null, 2);
   download(new Blob([data], { type: 'application/json' }), `${project.title}.struct`);
+  track('project_save');
 }
 
 $('#fileInput').addEventListener('change', async (e) => {
@@ -725,6 +783,7 @@ $('#fileInput').addEventListener('change', async (e) => {
     if (!Array.isArray(p.diagrams)) throw new Error('format');
     $('#startDialog').close();
     loadProject(p);
+    track('project_open', { source: 'file' });
   } catch (err) {
     message(tr('msg.badFile'));
   }
@@ -739,6 +798,7 @@ async function exportImage() {
   try {
     const canvas = await html2canvas($('#diagram'), { backgroundColor: '#fff', scale: 2 });
     canvas.toBlob((b) => download(b, `${diagram().name}.png`));
+    track('image_export');
   } finally {
     $('#diagram').classList.remove('export');
   }
@@ -780,7 +840,41 @@ function showHelp() {
     <ul>${items}</ul>
     <p><a href="https://janishuser.github.io/Structorizer/legacy/struct.html" target="_blank" rel="noopener">${tr('help.old')}</a></p>`;
   openInfo(tr('help.title'), div);
+  track('help_open');
 }
+
+function showPrivacy() {
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <p>${tr('privacy.local')}</p>
+    <p>${tr('privacy.ga')}</p>
+    <p>${tr('privacy.third')}</p>
+    <p class="hint">${tr(consent === 'granted' ? 'privacy.status.granted' : 'privacy.status.denied')}</p>
+    <button class="insert-btn"></button>`;
+  const toggle = div.querySelector('button');
+  toggle.textContent = tr(consent === 'granted' ? 'privacy.disable' : 'privacy.enable');
+  toggle.onclick = () => {
+    const grant = consent !== 'granted';
+    $('#infoDialog').close();
+    chooseConsent(grant);
+  };
+  openInfo(tr('privacy.title'), div);
+}
+
+/* consent dialog: asked once, before the start dialog */
+function chooseConsent(granted) {
+  setConsent(granted);
+  if ($('#consentDialog').open) $('#consentDialog').close();
+}
+$('#consentAccept').onclick = () => chooseConsent(true);
+$('#consentDecline').onclick = () => chooseConsent(false);
+$('#consentMore').onclick = (e) => { e.preventDefault(); showPrivacy(); };
+// Esc should not skip the choice (closedby="none" in index.html; preventDefault for older browsers).
+// If a browser closes it anyway, nothing is loaded or stored and the question comes back next visit.
+$('#consentDialog').addEventListener('cancel', (e) => e.preventDefault());
+$('#consentDialog').addEventListener('close', () => {
+  if (!project && !$('#startDialog').open) showStart();
+});
 
 /* start dialog */
 function showStart() {
@@ -793,12 +887,17 @@ function showStart() {
 }
 $('#newTitle').addEventListener('input', (e) => { $('#createBtn').disabled = !e.target.value.trim(); });
 $('#newTitle').addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.value.trim()) $('#createBtn').click(); });
-$('#createBtn').onclick = () => { $('#startDialog').close(); newProject($('#newTitle').value.trim()); };
+$('#createBtn').onclick = () => {
+  $('#startDialog').close();
+  newProject($('#newTitle').value.trim());
+  track('project_create');
+};
 $('#openBtn').onclick = () => $('#fileInput').click();
 $('#lastBtn').onclick = () => {
   try {
     loadProject(JSON.parse(localStorage.getItem(STORAGE_KEY)));
     $('#startDialog').close();
+    track('project_open', { source: 'last' });
   } catch (e) { message(tr('msg.lastFailed')); }
 };
 $('#startDialog').addEventListener('close', () => {
@@ -829,6 +928,7 @@ const actions = {
   undo, redo,
   delete: deleteSelected,
   info: showHelp,
+  privacy: showPrivacy,
 };
 
 document.querySelectorAll('.menu').forEach((menu) => {
@@ -858,6 +958,7 @@ $('#addTab').onclick = async () => {
   project.active = project.diagrams.length - 1;
   selectedId = null;
   commit();
+  track('diagram_add');
 };
 
 $('#collapseBtn').onclick = () => document.body.classList.toggle('collapsed');
@@ -877,4 +978,6 @@ document.addEventListener('keydown', (e) => {
 
 /* ---------------- boot ---------------- */
 applyLanguage();
-showStart();
+if (consent === 'granted') applyConsent();
+if (consent) showStart();
+else $('#consentDialog').showModal();

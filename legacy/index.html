@@ -800,14 +800,23 @@
 			});*/
         });
     </script>
-	<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J8R18F1LH0"></script>
+	<!-- Google Analytics: only loaded if the visitor allowed statistics in the new editor
+	     (same choice, stored as 'structorizer-consent'; can be changed there under Hilfe -> Datenschutz) -->
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J8R18F1LH0');
+  (function () {
+    var consent = null;
+    try { consent = localStorage.getItem('structorizer-consent'); } catch (e) { /* storage blocked */ }
+    if (consent !== 'granted') return;
+    window.dataLayer = window.dataLayer || [];
+    var gtag = window.gtag = function () { window.dataLayer.push(arguments); };
+    gtag('consent', 'default', { analytics_storage: 'granted', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
+    gtag('js', new Date());
+    gtag('config', 'G-J8R18F1LH0');
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-J8R18F1LH0';
+    document.head.appendChild(s);
+  })();
 </script>
 </head>
 
