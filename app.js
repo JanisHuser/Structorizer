@@ -15,11 +15,32 @@ const $ = (sel) => document.querySelector(sel);
    defaults are set up in index.html). Until then nothing is sent or stored. */
 
 const GA_ID = 'G-J8R18F1LH0';
-const CONSENT_KEY = 'structorizer-consent';
+const CONSENT_KEY = 'structorizer-consent'; // 'granted' | 'denied' (also read by the legacy pages)
+const CONSENT_AT_KEY = 'structorizer-consent-at'; // when the choice was made (ms since 1970)
 
-let consent = null; // 'granted' | 'denied' | null (not asked yet)
-try { consent = localStorage.getItem(CONSENT_KEY); } catch (e) { /* storage blocked */ }
-if (consent !== 'granted' && consent !== 'denied') consent = null;
+// Ask again after a while, but never on every visit (EU guidance: respect a refusal ~6 months)
+const DAY = 24 * 60 * 60 * 1000;
+const CONSENT_MAX_AGE = { granted: 395 * DAY, denied: 182 * DAY }; // ~13 months / ~6 months
+
+let consent = null; // 'granted' | 'denied' | null (ask)
+try {
+  consent = localStorage.getItem(CONSENT_KEY);
+  if (consent !== 'granted' && consent !== 'denied') {
+    consent = null;
+  } else {
+    let at = Number(localStorage.getItem(CONSENT_AT_KEY));
+    if (!at) { // choice made before dates were stored: count from now
+      at = Date.now();
+      localStorage.setItem(CONSENT_AT_KEY, String(at));
+    }
+    if (Date.now() - at > CONSENT_MAX_AGE[consent]) { // expired: forget it and ask again
+      if (consent === 'granted') deleteGaCookies();
+      localStorage.removeItem(CONSENT_KEY);
+      localStorage.removeItem(CONSENT_AT_KEY);
+      consent = null;
+    }
+  }
+} catch (e) { consent = null; /* storage blocked */ }
 
 let gaLoaded = false;
 
@@ -48,7 +69,10 @@ function deleteGaCookies() {
 
 function setConsent(granted) {
   consent = granted ? 'granted' : 'denied';
-  try { localStorage.setItem(CONSENT_KEY, consent); } catch (e) { /* ignore */ }
+  try {
+    localStorage.setItem(CONSENT_KEY, consent);
+    localStorage.setItem(CONSENT_AT_KEY, String(Date.now()));
+  } catch (e) { /* ignore */ }
   applyConsent();
   if (!granted) deleteGaCookies();
 }

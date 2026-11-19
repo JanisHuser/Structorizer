@@ -807,6 +807,9 @@
     var consent = null;
     try { consent = localStorage.getItem('structorizer-consent'); } catch (e) { /* storage blocked */ }
     if (consent !== 'granted') return;
+    var at = 0;
+    try { at = Number(localStorage.getItem('structorizer-consent-at')); } catch (e) { /* ignore */ }
+    if (at && Date.now() - at > 395 * 24 * 60 * 60 * 1000) return; // older than ~13 months: the editor asks again first
     window.dataLayer = window.dataLayer || [];
     var gtag = window.gtag = function () { window.dataLayer.push(arguments); };
     gtag('consent', 'default', { analytics_storage: 'granted', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
