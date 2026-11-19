@@ -843,9 +843,29 @@ function showHelp() {
   track('help_open');
 }
 
+// Operator of the site (legal notice / data controller), same in every language
+const OPERATOR = {
+  company: 'J.Huser IT Services',
+  owner: 'Janis Huser',
+  street: 'Abläschstrasse 66',
+  city: '8750 Glarus, Schweiz',
+  uid: 'CHE-299.352.957',
+  email: 'info@jhuser-it-services.ch',
+  website: 'https://jhuser-it-services.ch',
+};
+
 function showPrivacy() {
+  const o = OPERATOR;
   const div = document.createElement('div');
   div.innerHTML = `
+    <p><b>${tr('privacy.responsible')}:</b><br>
+      ${o.company}<br>
+      ${tr('privacy.owner')}: ${o.owner}<br>
+      ${o.street}<br>
+      ${o.city}<br>
+      UID: ${o.uid}<br>
+      <a href="mailto:${o.email}">${o.email}</a> · <a href="${o.website}" target="_blank" rel="noopener">${o.website.replace('https://', '')}</a></p>
+    <p>${tr('privacy.rights')}</p>
     <p>${tr('privacy.local')}</p>
     <p>${tr('privacy.ga')}</p>
     <p>${tr('privacy.third')}</p>
