@@ -64,9 +64,8 @@
   --paper: #fff; --line: #1c1f26; --slot: #f2f3f8; --text: #16181d; --muted: #6b7280;
   color: #16181d; background: #fff; border: 0; border-radius: 0; box-shadow: none;
   /* only as big as the content, without the empty space of the window */
-  display: inline-flex; width: auto; min-width: 640px; min-height: 0;
+  display: inline-flex; width: auto; min-width: 640px;
 }
-#diagram.export .struct > .seq { flex: none; }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
@@ -234,9 +233,10 @@ body.collapsed .collapse .arrow { font-size: 18px; transform: rotate(180deg); }
   background-image: radial-gradient(var(--dot) 1px, transparent 1px);
   background-size: 18px 18px;
 }
-/* The diagram fills the visible canvas and grows (with scrolling) when its content is larger */
+/* The diagram is as wide as the visible canvas (at least 640px, wider with scrolling when
+   the content needs it) and only as high as its content */
 #diagram {
-  display: flex; flex-direction: column; width: max-content; min-width: 100%; min-height: 100%;
+  display: flex; flex-direction: column; width: max-content; min-width: max(100%, 640px);
   padding: 24px; color: var(--text);
   background: var(--paper); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow);
 }
@@ -253,7 +253,7 @@ body.collapsed .collapse .arrow { font-size: 18px; transform: rotate(180deg); }
   background-image: repeating-linear-gradient(135deg, transparent 0 6px, rgba(127,127,160,.07) 6px 12px);
 }
 .struct > .seq {
-  flex: 1; margin-left: 26px; margin-bottom: 14px;
+  margin-left: 26px; margin-bottom: 14px;
   border-top: 1px solid var(--line); border-left: 1px solid var(--line); border-bottom: 1px solid var(--line);
 }
 
@@ -485,7 +485,7 @@ dialog.info .close:hover { background: var(--hover); color: var(--text); }
   .tool { font-size: 13px; gap: 8px; padding: 6px; }
   .tool i { width: 24px; height: 24px; }
   #canvas { padding: 12px; }
-  #diagram { padding: 12px; }
+  #diagram { padding: 12px; min-width: 100%; }
 }
 
 /* =========================================================
