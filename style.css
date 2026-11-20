@@ -107,7 +107,7 @@ kbd { font-family: inherit; }
   display: flex; justify-content: space-between; align-items: center; width: 100%; border: 0; background: none;
   text-align: left; padding: 7px 10px; border-radius: 7px; font-size: 13.5px;
 }
-.menu-items button:hover { background: var(--hover); }
+@media (hover: hover) { .menu-items button:hover { background: var(--hover); } }
 .menu-items kbd { color: var(--muted); font-size: 12px; margin-left: 20px; }
 .menu-items hr { border: 0; border-top: 1px solid var(--border); margin: 5px 4px; }
 
@@ -117,7 +117,7 @@ kbd { font-family: inherit; }
   margin-left: auto; max-width: 112px; padding: 5px 6px; font: inherit; font-size: 13px; color: var(--muted);
   background: var(--surface); border: 1px solid var(--border); border-radius: 7px; cursor: pointer;
 }
-#langSelect:hover { color: var(--text); background: var(--hover); }
+@media (hover: hover) { #langSelect:hover { color: var(--text); background: var(--hover); } }
 
 /* =========================================================
    Tabs
@@ -131,7 +131,7 @@ kbd { font-family: inherit; }
   display: flex; align-items: center; border-radius: 8px; white-space: nowrap;
   font-size: 13px; font-weight: 500; color: var(--muted);
 }
-.tab:hover { background: var(--hover); color: var(--text); }
+@media (hover: hover) { .tab:hover { background: var(--hover); color: var(--text); } }
 .tab.active { background: var(--accent-soft); color: var(--accent-text); }
 .tab button { border: 0; background: none; color: inherit; font: inherit; }
 .tab-name { padding: 6px 12px; border-radius: 8px; }
@@ -140,12 +140,12 @@ kbd { font-family: inherit; }
   width: 22px; height: 22px; margin-right: 4px; display: grid; place-items: center;
   border-radius: 6px; font-size: 16px; line-height: 1; opacity: .65;
 }
-.tab .x:hover { background: var(--danger-soft); color: var(--danger); opacity: 1; }
+@media (hover: hover) { .tab .x:hover { background: var(--danger-soft); color: var(--danger); opacity: 1; } }
 #addTab {
   width: 30px; height: 30px; border-radius: 8px; border: 1px dashed var(--border); background: none;
   color: var(--muted); font-size: 18px; line-height: 1;
 }
-#addTab:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+@media (hover: hover) { #addTab:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); } }
 
 /* =========================================================
    Layout + sidebar
@@ -169,7 +169,7 @@ main { flex: 1; display: flex; min-height: 0; }
   display: flex; align-items: center; gap: 10px; padding: 6px 8px; margin-bottom: 2px; border-radius: 8px;
   cursor: grab; user-select: none; font-weight: 500; transition: background .12s, transform .12s;
 }
-.tool:hover { background: var(--hover); }
+@media (hover: hover) { .tool:hover { background: var(--hover); } }
 .tool:active { cursor: grabbing; transform: scale(.98); }
 .tool i {
   width: 28px; height: 28px; flex-shrink: 0; display: grid; place-items: center; font-style: normal; font-weight: 600;
@@ -192,7 +192,7 @@ main { flex: 1; display: flex; min-height: 0; }
 }
 .case-row button:disabled { opacity: .4; cursor: default; }
 .props .small { width: 100%; padding: 6px; margin-top: 2px; color: var(--accent-text); font-weight: 500; }
-.props .small:hover { background: var(--accent-soft); border-color: transparent; }
+@media (hover: hover) { .props .small:hover { background: var(--accent-soft); border-color: transparent; } }
 .case-heading { font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
 .case-row:last-of-type input { font-style: italic; }
 .props #deleteBtn { width: 100%; margin-top: 8px; }
@@ -201,7 +201,7 @@ main { flex: 1; display: flex; min-height: 0; }
   padding: 6px 2px; font-size: 12px; font-weight: 500; border: 1px solid var(--border); border-radius: 7px;
   background: var(--surface); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.prop-actions button:not(:disabled):hover { background: var(--accent-soft); color: var(--accent-text); border-color: transparent; }
+@media (hover: hover) { .prop-actions button:not(:disabled):hover { background: var(--accent-soft); color: var(--accent-text); border-color: transparent; } }
 .prop-actions button:disabled, .menu-items button:disabled { opacity: .4; cursor: default; }
 .menu-items button:disabled:hover { background: none; }
 
@@ -209,13 +209,13 @@ button.danger {
   border: 1px solid transparent; padding: 9px; border-radius: 8px; font-weight: 600;
   background: var(--danger-soft); color: var(--danger);
 }
-button.danger:not(:disabled):hover { background: var(--danger); color: #fff; }
+@media (hover: hover) { button.danger:not(:disabled):hover { background: var(--danger); color: #fff; } }
 button.danger:disabled { opacity: .45; cursor: default; }
 .collapse {
   display: flex; align-items: center; gap: 8px; border: 0; background: none; padding: 8px; border-radius: 8px;
   color: var(--muted); font-weight: 500; white-space: nowrap;
 }
-.collapse:hover { background: var(--hover); color: var(--text); }
+@media (hover: hover) { .collapse:hover { background: var(--hover); color: var(--text); } }
 .collapse .arrow { font-size: 18px; line-height: 1; width: 16px; transition: transform .2s; }
 
 body.collapsed #sidebar { width: 52px; padding: 12px 6px; }
@@ -233,10 +233,10 @@ body.collapsed .collapse .arrow { font-size: 18px; transform: rotate(180deg); }
   background-image: radial-gradient(var(--dot) 1px, transparent 1px);
   background-size: 18px 18px;
 }
-/* The diagram is as wide as the visible canvas (at least 640px, wider with scrolling when
-   the content needs it) and only as high as its content */
+/* The diagram is as wide as the visible canvas (wider, with scrolling, only when its content
+   needs the room) and only as high as its content */
 #diagram {
-  display: flex; flex-direction: column; width: max-content; min-width: max(100%, 640px);
+  display: flex; flex-direction: column; width: max-content; min-width: 100%;
   padding: 24px; color: var(--text);
   background: var(--paper); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow);
 }
@@ -261,7 +261,7 @@ body.collapsed .collapse .arrow { font-size: 18px; transform: rotate(180deg); }
 .el.selected { outline: 2px solid var(--accent); outline-offset: -1px; z-index: 2; box-shadow: 0 0 0 5px var(--accent-soft); }
 .el > .head, .el > .foot, .el.instruction, .el.call, .el.jump { cursor: pointer; }
 .label { padding: 8px 12px; white-space: pre-wrap; word-break: break-word; min-height: 2.4em; line-height: 1.45; }
-.label:hover, .el > .head:hover { background-color: var(--el-hover); }
+@media (hover: hover) { .label:hover, .el > .head:hover { background-color: var(--el-hover); } }
 
 /* loops */
 .el > .body { margin-left: 26px; border-left: 1px solid var(--line); }
@@ -329,7 +329,7 @@ body.collapsed .collapse .arrow { font-size: 18px; transform: rotate(180deg); }
   border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent-text); font-weight: 600; font-size: 13px;
 }
 .run-btn i { font-style: normal; font-size: 11px; }
-.run-btn:hover { background: var(--accent); color: #fff; }
+@media (hover: hover) { .run-btn:hover { background: var(--accent); color: #fff; } }
 
 #runPanel {
   width: 290px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; overflow-y: auto;
@@ -340,7 +340,7 @@ body.collapsed .collapse .arrow { font-size: 18px; transform: rotate(180deg); }
 #runPanel .close {
   width: 30px; height: 30px; border-radius: 8px; border: 0; background: none; color: var(--muted); font-size: 20px; line-height: 1;
 }
-#runPanel .close:hover { background: var(--hover); color: var(--text); }
+@media (hover: hover) { #runPanel .close:hover { background: var(--hover); color: var(--text); } }
 #runPanel h3 { margin: 10px 0 0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
 .run-controls { display: flex; gap: 6px; }
 .run-controls button {
@@ -349,7 +349,7 @@ body.collapsed .collapse .arrow { font-size: 18px; transform: rotate(180deg); }
 }
 .run-controls button i { font-style: normal; font-size: 11px; }
 .run-controls #runRestart { flex: 0 0 38px; font-size: 16px; }
-.run-controls button:not(:disabled):hover { background: var(--hover); }
+@media (hover: hover) { .run-controls button:not(:disabled):hover { background: var(--hover); } }
 .run-controls .primary:not(:disabled), .run-controls .primary:not(:disabled):hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 .run-controls button:disabled { opacity: .45; cursor: default; }
 .run-speed { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); }
@@ -380,8 +380,35 @@ body.running #diagram .el.selected { outline: 0; box-shadow: none; }
   :root:not([data-theme="light"]) #diagram .run-current, :root:not([data-theme="light"]) #runVars tr.changed td { background: #4a3a10 !important; }
   :root:not([data-theme="light"]) .run-status.done { background: #12321f; color: #5fd08f; }
 }
-@media (max-width: 760px) {
-  #runPanel { position: fixed; left: 0; right: 0; bottom: 0; width: auto; max-height: 48vh; z-index: 35; box-shadow: var(--shadow-lg); border-left: 0; border-top: 1px solid var(--border); }
+/* Narrow windows and portrait iPad: the run panel sits at the bottom (two columns) so the
+   diagram keeps the full width */
+@media (max-width: 760px), (orientation: portrait) and (max-width: 1100px) {
+  #runPanel {
+    position: fixed; left: 0; right: 0; bottom: 0; width: auto; max-height: 42vh; z-index: 35;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    box-shadow: var(--shadow-lg); border-left: 0; border-top: 1px solid var(--border);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; align-content: start;
+    grid-template-areas: "head head" "ctrl speed" "status status" "vh oh" "vars out";
+  }
+  #runPanel > header { grid-area: head; }
+  #runPanel > .run-controls { grid-area: ctrl; }
+  #runPanel > .run-speed { grid-area: speed; }
+  #runPanel > .run-status { grid-area: status; }
+  #runPanel > h3:nth-of-type(1) { grid-area: vh; margin: 0; }
+  #runPanel > h3:nth-of-type(2) { grid-area: oh; margin: 0; }
+  #runPanel > #runVars { grid-area: vars; align-self: start; }
+  #runPanel > #runOutput { grid-area: out; max-height: none; }
+  #runPanel > .run-hint { display: none; }
+  /* room to scroll the diagram above the panel */
+  main:has(#runPanel:not([hidden])) #canvas { padding-bottom: 44vh; }
+}
+@media (max-width: 480px) {
+  #runPanel { grid-template-columns: 1fr; grid-template-areas: "head" "ctrl" "speed" "status" "vh" "vars" "oh" "out"; max-height: 55vh; }
+}
+/* Portrait iPad: a bit narrower sidebar, less padding around the diagram */
+@media (orientation: portrait) and (max-width: 1100px) {
+  #sidebar { width: 204px; }
+  #canvas { padding: 16px; }
 }
 
 /* =========================================================
@@ -407,14 +434,14 @@ dialog::backdrop { background: rgba(15, 17, 21, .35); backdrop-filter: blur(4px)
   display: block; width: 100%; padding: 10px; border-radius: 9px; font-weight: 600; margin-bottom: 8px;
   border: 1px solid var(--border); background: var(--surface);
 }
-#startDialog button:not(:disabled):hover { background: var(--hover); }
+@media (hover: hover) { #startDialog button:not(:disabled):hover { background: var(--hover); } }
 #startDialog button:disabled { color: var(--muted); opacity: .6; cursor: default; }
 #startDialog .lang-picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
 #startDialog .lang-picker button { width: auto; margin: 0; padding: 7px 2px; font-size: 12.5px; font-weight: 500; }
 #startDialog .lang-picker button.active,
 #startDialog .lang-picker button.active:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
 #createBtn:not(:disabled), #startDialog button.primary:not(:disabled) { background: var(--accent); border-color: var(--accent); color: #fff; }
-#createBtn:not(:disabled):hover, #startDialog button.primary:not(:disabled):hover { background: var(--accent); filter: brightness(1.08); }
+@media (hover: hover) { #createBtn:not(:disabled):hover, #startDialog button.primary:not(:disabled):hover { background: var(--accent); filter: brightness(1.08); } }
 #startDialog button.primary { margin: 0; }
 
 #askDialog { width: min(360px, calc(100vw - 32px)); padding: 20px; }
@@ -426,7 +453,7 @@ dialog::backdrop { background: rgba(15, 17, 21, .35); backdrop-filter: blur(4px)
 #askDialog input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .ask-actions { display: flex; flex-direction: row-reverse; justify-content: flex-start; gap: 8px; margin-top: 16px; }
 .ask-actions button { padding: 8px 14px; border-radius: 9px; font-weight: 600; border: 1px solid var(--border); background: var(--surface); }
-.ask-actions button:hover { background: var(--hover); }
+@media (hover: hover) { .ask-actions button:hover { background: var(--hover); } }
 .ask-actions .primary, .ask-actions .primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 
 #consentDialog { width: min(420px, calc(100vw - 32px)); padding: 22px; }
@@ -442,7 +469,7 @@ dialog.info header {
 dialog.info .close {
   width: 30px; height: 30px; border-radius: 8px; border: 0; background: none; color: var(--muted); font-size: 20px; line-height: 1;
 }
-dialog.info .close:hover { background: var(--hover); color: var(--text); }
+@media (hover: hover) { dialog.info .close:hover { background: var(--hover); color: var(--text); } }
 #infoBody { padding: 10px 20px 20px; max-height: 70vh; overflow: auto; line-height: 1.55; }
 #infoBody ul { padding-left: 20px; }
 #infoBody a { color: var(--accent-text); }
@@ -458,10 +485,10 @@ dialog.info .close:hover { background: var(--hover); color: var(--text); }
 .insert-btn {
   padding: 8px 16px; border-radius: 9px; border: 0; font-weight: 600; background: var(--accent); color: #fff;
 }
-.insert-btn:hover { filter: brightness(1.08); }
+@media (hover: hover) { .insert-btn:hover { filter: brightness(1.08); } }
 .code-tabs { display: flex; gap: 4px; padding: 3px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 9px; width: fit-content; }
 .code-tabs button { border: 0; background: none; padding: 5px 12px; border-radius: 7px; font-weight: 500; color: var(--muted); }
-.code-tabs button:hover { color: var(--text); }
+@media (hover: hover) { .code-tabs button:hover { color: var(--text); } }
 .code-tabs button.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
 .code-box { position: relative; }
 .code-box pre { padding-right: 90px !important; }
@@ -469,7 +496,7 @@ dialog.info .close:hover { background: var(--hover); color: var(--text); }
   position: absolute; top: 8px; right: 8px; padding: 5px 10px; border-radius: 7px; font-size: 12px; font-weight: 500;
   border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); color: #c9cdd6;
 }
-.code-box .copy-btn:hover { background: rgba(255,255,255,.14); color: #fff; }
+@media (hover: hover) { .code-box .copy-btn:hover { background: rgba(255,255,255,.14); color: #fff; } }
 
 /* Short windows: compact palette so all elements stay reachable */
 @media (max-height: 640px) {
@@ -492,12 +519,25 @@ dialog.info .close:hover { background: var(--hover); color: var(--text); }
   .tool { font-size: 13px; gap: 8px; padding: 6px; }
   .tool i { width: 24px; height: 24px; }
   #canvas { padding: 12px; }
-  #diagram { padding: 12px; min-width: 100%; }
+  #diagram { padding: 12px; }
 }
 
 /* =========================================================
    Touch screens (iPad): bigger targets, no zoom when typing
+   Hover effects only apply with a mouse/trackpad (@media (hover: hover)),
+   otherwise they stay stuck after a tap. Touch gets a short press feedback.
    ========================================================= */
+@media (hover: none) {
+  .menu-items button:not(:disabled):active, .tool:active, .tab:active, .collapse:active, #langSelect:active,
+  .props .small:active, .prop-actions button:not(:disabled):active, .run-controls button:not(:disabled):active,
+  #startDialog button:not(:disabled):active, .ask-actions button:active, dialog.info .close:active,
+  #runPanel .close:active, .code-tabs button:active { background: var(--hover); }
+  #addTab:active, .run-btn:active { background: var(--accent-soft); }
+  .tab .x:active, button.danger:not(:disabled):active { background: var(--danger-soft); color: var(--danger); }
+  .code-box .copy-btn:active { background: rgba(255,255,255,.14); }
+  .run-controls .primary:not(:disabled):active, #createBtn:not(:disabled):active, .insert-btn:active,
+  #startDialog button.primary:not(:disabled):active, .ask-actions .primary:active { filter: brightness(1.12); }
+}
 @media (pointer: coarse) {
   .menubar { height: 52px; }
   .menu-title { padding: 9px 12px; }

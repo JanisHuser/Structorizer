@@ -928,6 +928,9 @@ document.addEventListener('touchcancel', () => {
   releaseTouch();
 });
 
+// iOS Safari only shows :active (the tap feedback in style.css) when a touch listener exists
+document.addEventListener('touchstart', () => {}, { passive: true });
+
 // No long-press menu / text magnifier on elements that can be dragged
 document.addEventListener('contextmenu', (e) => {
   if (e.target.closest?.('#diagram .el, .tool')) e.preventDefault();
