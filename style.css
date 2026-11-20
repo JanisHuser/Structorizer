@@ -23,6 +23,11 @@
   --slot-hover: #e4e3ff;
   --el-hover: #f6f6fb;
 
+  /* code blocks (export, run output) */
+  --code-bg: #f6f7f9;
+  --code-text: #1f2328;
+  --code-border: #e3e6ec;
+
   --radius: 10px;
   --shadow-sm: 0 1px 2px rgba(16, 24, 40, .06);
   --shadow: 0 1px 2px rgba(16, 24, 40, .05), 0 8px 24px -6px rgba(16, 24, 40, .12);
@@ -53,6 +58,9 @@
     --slot: #22262e;
     --slot-hover: #2d2d5c;
     --el-hover: #20242c;
+    --code-bg: #14161b;
+    --code-text: #e6e8ee;
+    --code-border: #2a2f39;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -6px rgba(0,0,0,.5);
     --shadow-lg: 0 24px 60px -12px rgba(0,0,0,.7);
     color-scheme: dark;
@@ -365,7 +373,8 @@ body.collapsed .collapse .arrow { font-size: 18px; transform: rotate(180deg); }
 #runVars tr.changed td { background: #fff3c4; }
 #runOutput {
   margin: 0; min-height: 80px; max-height: 40vh; overflow: auto; padding: 10px 12px; border-radius: 9px; white-space: pre-wrap;
-  background: #14161b; color: #e6e8ee; font: 12.5px/1.5 "JetBrains Mono", ui-monospace, Menlo, monospace;
+  background: var(--code-bg); color: var(--code-text); border: 1px solid var(--code-border);
+  font: 12.5px/1.5 "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 .run-hint { margin: 4px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--muted); }
 .run-hint code { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 11px; }
@@ -491,7 +500,7 @@ dialog.info .close {
 }
 .menu-items kbd { border: 0; background: none; padding: 0; }
 #infoBody pre {
-  background: #14161b; color: #e6e8ee; padding: 14px 16px; overflow: auto; margin: 10px 0 0; border-radius: 10px; max-height: 58vh;
+  background: var(--code-bg); color: var(--code-text); border: 1px solid var(--code-border); padding: 14px 16px; overflow: auto; margin: 10px 0 0; border-radius: 10px; max-height: 58vh;
   font: 13px/1.6 "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 #infoBody .hint { color: var(--muted); font-size: 13px; }
@@ -507,9 +516,9 @@ dialog.info .close {
 .code-box pre { padding-right: 90px !important; }
 .code-box .copy-btn {
   position: absolute; top: 8px; right: 8px; padding: 5px 10px; border-radius: 7px; font-size: 12px; font-weight: 500;
-  border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); color: #c9cdd6;
+  border: 1px solid var(--border); background: var(--surface); color: var(--muted);
 }
-@media (hover: hover) { .code-box .copy-btn:hover { background: rgba(255,255,255,.14); color: #fff; } }
+@media (hover: hover) { .code-box .copy-btn:hover { background: var(--hover); color: var(--text); } }
 
 /* Short windows: compact palette so all elements stay reachable */
 @media (max-height: 640px) {
@@ -551,7 +560,7 @@ dialog.info .close {
   #runPanel .close:active, .code-tabs button:active { background: var(--hover); }
   #addTab:active, .run-btn:active { background: var(--accent-soft); }
   .tab .x:active, button.danger:not(:disabled):active { background: var(--danger-soft); color: var(--danger); }
-  .code-box .copy-btn:active { background: rgba(255,255,255,.14); }
+  .code-box .copy-btn:active { background: var(--hover); }
   .run-controls .primary:not(:disabled):active, #createBtn:not(:disabled):active, .insert-btn:active,
   #startDialog button.primary:not(:disabled):active, .ask-actions .primary:active { filter: brightness(1.12); }
 }
@@ -570,4 +579,10 @@ dialog.info .close {
   /* iOS zooms into fields with text smaller than 16px */
   .props textarea, .props input, #startDialog input, #askDialog input, #langSelect { font-size: 16px; }
   .label { min-height: 2.8em; }
+}
+
+/* Code font: show "<=", "!=", "->" as typed, not as ligature symbols (≤, ≠, →).
+   Last in the file: the "font" shorthand on code blocks above would switch ligatures back on. */
+pre, code, textarea, #runVars, #infoBody pre, #runOutput, #editDialog textarea {
+  font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0;
 }
