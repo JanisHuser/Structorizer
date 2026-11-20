@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=7">
   <!-- Google Analytics with Consent Mode v2: nothing is loaded or stored until the visitor agrees (see consent in app.js) -->
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -49,6 +49,11 @@
         <button data-action="undo"><span data-i18n="action.undo">Rückgängig</span> <kbd>Ctrl+Z</kbd></button>
         <button data-action="redo"><span data-i18n="action.redo">Wiederholen</span> <kbd>Ctrl+Y</kbd></button>
         <hr>
+        <button data-action="cut"><span data-i18n="action.cut">Ausschneiden</span> <kbd>Ctrl+X</kbd></button>
+        <button data-action="copy"><span data-i18n="action.copy">Kopieren</span> <kbd>Ctrl+C</kbd></button>
+        <button data-action="paste"><span data-i18n="action.paste">Einfügen</span> <kbd>Ctrl+V</kbd></button>
+        <button data-action="duplicate"><span data-i18n="action.duplicate">Duplizieren</span> <kbd>Ctrl+D</kbd></button>
+        <hr>
         <button data-action="delete"><span data-i18n="action.delete">Element löschen</span> <kbd data-i18n="key.delete">Entf</kbd></button>
       </div>
     </div>
@@ -66,6 +71,7 @@
   <div class="tabbar">
     <div id="tabs"></div>
     <button id="addTab" data-i18n-title="tab.add">+</button>
+    <button id="runBtn" class="run-btn" title="Ctrl+Enter"><i>▶</i> <span data-i18n="run.button">Ausführen</span></button>
   </div>
 
   <main>
@@ -82,12 +88,19 @@
         <h3 data-i18n="palette.other">Weitere Elemente</h3>
         <div class="tool" draggable="true" data-type="instruction"><i>=</i><span data-i18n="el.instruction.name">Anweisung</span></div>
         <div class="tool" draggable="true" data-type="call"><i>ƒ</i><span data-i18n="el.call.name">Funktion</span></div>
+        <div class="tool" draggable="true" data-type="jump"><i>↩</i><span data-i18n="el.jump.name">Aussprung</span></div>
+        <div class="tool" draggable="true" data-type="parallel"><i>∥</i><span data-i18n="el.parallel.name">Parallel</span></div>
       </div>
 
       <div id="props" class="props" hidden>
         <h3 id="propTitle">Element</h3>
         <label><span id="propLabel">Text</span> <textarea id="propText" rows="2"></textarea></label>
         <div id="caseProps"></div>
+        <div class="prop-actions">
+          <button data-action="duplicate" data-i18n="action.duplicate">Duplizieren</button>
+          <button data-action="copy" data-i18n="action.copy">Kopieren</button>
+          <button data-action="paste" data-i18n="action.paste">Einfügen</button>
+        </div>
         <button id="deleteBtn" class="danger" data-i18n="action.delete" disabled>Element löschen</button>
       </div>
       </div>
@@ -98,6 +111,26 @@
     <section id="canvas">
       <div id="diagram"></div>
     </section>
+
+    <!-- Step-through run: controls, variables, output -->
+    <aside id="runPanel" hidden>
+      <header>
+        <span data-i18n="run.title">Ausführen</span>
+        <button id="runClose" class="close" data-i18n-title="common.close">×</button>
+      </header>
+      <div class="run-controls">
+        <button id="runStep" title="F10 / →"><i>⏭</i> <span data-i18n="run.step">Schritt</span></button>
+        <button id="runPlay" class="primary"><i>▶</i> <span data-i18n="run.play">Abspielen</span></button>
+        <button id="runRestart" data-i18n-title="run.restart">↺</button>
+      </div>
+      <label class="run-speed"><span data-i18n="run.speed">Tempo</span> <input type="range" id="runSpeed" min="0" max="4" step="1" value="2"></label>
+      <div id="runStatus" class="run-status"></div>
+      <h3 data-i18n="run.vars">Variablen</h3>
+      <table id="runVars"></table>
+      <h3 data-i18n="run.output">Ausgabe</h3>
+      <pre id="runOutput"></pre>
+      <p class="run-hint" data-i18n-html="run.hint"></p>
+    </aside>
   </main>
 
   <!-- Start dialog -->
@@ -145,7 +178,8 @@
   <input type="file" id="fileInput" accept=".json,.struct" hidden>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
-  <script src="i18n.js?v=7"></script>
-  <script src="app.js?v=8"></script>
+  <script src="i18n.js?v=8"></script>
+  <script src="app.js?v=9"></script>
+  <script src="run.js?v=1"></script>
 </body>
 </html>

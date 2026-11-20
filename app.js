@@ -93,12 +93,15 @@ const EXAMPLES = {
   if: 'if (a > b) {\n  …\n} else {\n  …\n}',
   switch: 'switch (x) {\n  case 1: …; break;\n  default: …\n}',
   instruction: 'a = a + 1;',
+  jump: 'while (true) {\n  …\n  if (a > 10) break;\n}\nreturn a;',
+  parallel: 'Thread t1 = new Thread(() -> { … });\nThread t2 = new Thread(() -> { … });\nt1.start(); t2.start();',
 };
 
 let project = null;
 let selectedId = null;
 let past = [];
 let future = [];
+let runner = null; // step-through run in progress (run.js)
 
 /* ---------------- model helpers ---------------- */
 
@@ -110,6 +113,7 @@ function createNode(type) {
   if (['while', 'dowhile', 'for'].includes(type)) n.body = [];
   if (type === 'if') { n.yes = []; n.no = []; }
   if (type === 'switch') n.cases = [{ label: '1', body: [] }, { label: '2', body: [] }, { label: tr('case.default'), auto: true, body: [] }];
+  if (type === 'parallel') n.threads = [[], []];
   return n;
 }
 
@@ -117,6 +121,7 @@ function childLists(node) {
   if (node.body) return [node.body];
   if (node.type === 'if') return [node.yes, node.no];
   if (node.cases) return node.cases.map((c) => c.body);
+  if (node.threads) return node.threads;
   return [];
 }
 
@@ -259,6 +264,7 @@ function render() {
   $('#diagram').replaceChildren(root);
   layoutDecisions();
   renderProps();
+  if (typeof highlightRun === 'function') highlightRun();
 }
 
 function renderSeq(list, extraClass = '') {
@@ -296,6 +302,16 @@ function renderNode(node) {
     case 'call':
       el.append(label(node.text));
       break;
+    case 'jump': {
+      // arrow-shaped left edge: the jump leaves the current block
+      const l = label(node.text);
+      l.insertAdjacentHTML('afterbegin', '<svg class="jump-mark" viewBox="0 0 10 10" preserveAspectRatio="none"><path d="M10 0L0 5L10 10"/></svg>');
+      el.append(l);
+      break;
+    }
+    case 'parallel':
+      el.append(parallelBar(node.text, 'top'), cols(node.threads), parallelBar('', 'bottom'));
+      break;
     case 'while':
     case 'for': {
       const head = label(node.text, 'label head');
@@ -322,6 +338,16 @@ function renderNode(node) {
       break;
   }
   return el;
+}
+
+/** Top / bottom bar of a parallel block: diagonals in both corners (one bar per thread split). */
+function parallelBar(text, pos) {
+  const bar = label(text, `par ${pos}`);
+  const d = pos === 'top' ? ['M0 0L10 10', 'M10 0L0 10'] : ['M0 10L10 0', 'M0 0L10 10'];
+  bar.insertAdjacentHTML('beforeend',
+    `<svg class="l" viewBox="0 0 10 10" preserveAspectRatio="none"><path d="${d[0]}"/></svg>`
+    + `<svg class="r" viewBox="0 0 10 10" preserveAspectRatio="none"><path d="${d[1]}"/></svg>`);
+  return bar;
 }
 
 function decisionHead(text, labels) {
@@ -470,6 +496,7 @@ async function renameDiagram(i) {
 /* ---------------- properties panel ---------------- */
 
 function renderProps() {
+  updateEditActions();
   const hit = selectedId && find(selectedId);
   $('#props').hidden = !hit;
   $('#deleteBtn').disabled = !hit;
@@ -481,6 +508,7 @@ function renderProps() {
   if (document.activeElement !== text) text.value = node.text;
 
   const caseBox = $('#caseProps');
+  if (node.type === 'parallel') { renderThreadProps(node, caseBox); return; }
   if (node.type !== 'switch') { caseBox.replaceChildren(); return; }
   if (caseBox.contains(document.activeElement)) return;
   caseBox.replaceChildren();
@@ -524,6 +552,40 @@ function renderProps() {
   caseBox.append(add);
 }
 
+/** Parallel block: list of threads with remove buttons and "add thread". */
+function renderThreadProps(node, box) {
+  box.replaceChildren();
+  const heading = document.createElement('div');
+  heading.className = 'case-heading';
+  heading.textContent = tr('thread.heading');
+  box.append(heading);
+  node.threads.forEach((t, i) => {
+    const row = document.createElement('div');
+    row.className = 'case-row thread-row';
+    const name = document.createElement('span');
+    name.textContent = tr('thread.label', { n: i + 1 });
+    const count = document.createElement('small');
+    count.textContent = t.length ? `(${t.length})` : '';
+    const rm = document.createElement('button');
+    rm.textContent = '−';
+    rm.title = tr('thread.remove');
+    rm.disabled = node.threads.length <= 2;
+    rm.onclick = async () => {
+      if (t.length && !await ask(tr('thread.removeAsk', { n: i + 1, count: t.length }), null, tr('common.remove'))) return;
+      snapshot();
+      node.threads.splice(i, 1);
+      commit();
+    };
+    row.append(name, count, rm);
+    box.append(row);
+  });
+  const add = document.createElement('button');
+  add.className = 'small';
+  add.textContent = tr('thread.add');
+  add.onclick = () => { snapshot(); node.threads.push([]); commit(); };
+  box.append(add);
+}
+
 const snapText = snapshotOnce($('#propText'));
 $('#propText').addEventListener('input', (e) => {
   const hit = find(selectedId);
@@ -543,16 +605,79 @@ function select(id) {
   if (id) $('#props').scrollIntoView({ block: 'nearest' });
 }
 
-/** Insert a new element after the selected one (or at the end) – used without drag & drop. */
-function insertNode(type) {
-  snapshot();
-  const node = createNode(type);
+/** Put a node after the selected one (or at the end of the diagram) and select it. */
+function placeNode(node) {
   const hit = selectedId && find(selectedId);
   if (hit) hit.list.splice(hit.index + 1, 0, node);
   else diagram().body.push(node);
   selectedId = node.id;
+}
+
+/** Insert a new element after the selected one (or at the end) – used without drag & drop. */
+function insertNode(type) {
+  snapshot();
+  placeNode(createNode(type));
   commit();
   track('element_add', { element_type: type, method: 'button' });
+}
+
+/* ---------------- copy & paste ----------------
+   The clipboard holds one element (with everything inside it). It is kept in
+   localStorage so it also works across browser tabs and after a reload. */
+
+const CLIP_KEY = 'structorizer-clipboard';
+let clipboard = null; // JSON of the copied node
+try { clipboard = localStorage.getItem(CLIP_KEY); } catch (e) { /* ignore */ }
+window.addEventListener('storage', (e) => { if (e.key === CLIP_KEY) { clipboard = e.newValue; updateEditActions(); } });
+
+/** Deep copy of a node with fresh ids, so the copy is independent of the original. */
+function cloneNode(node) {
+  const copy = JSON.parse(JSON.stringify(node));
+  const renew = (n) => { n.id = uid(); childLists(n).forEach((l) => l.forEach(renew)); };
+  renew(copy);
+  return copy;
+}
+
+function copySelected() {
+  const hit = selectedId && find(selectedId);
+  if (!hit) return false;
+  clipboard = JSON.stringify(hit.node);
+  try { localStorage.setItem(CLIP_KEY, clipboard); } catch (e) { /* ignore */ }
+  updateEditActions();
+  return true;
+}
+
+function cutSelected() {
+  if (copySelected()) deleteSelected();
+}
+
+function pasteClipboard() {
+  if (!clipboard) return;
+  let node;
+  try { node = cloneNode(JSON.parse(clipboard)); } catch (e) { return; }
+  snapshot();
+  placeNode(node);
+  commit();
+  track('element_paste');
+}
+
+function duplicateSelected() {
+  const hit = selectedId && find(selectedId);
+  if (!hit) return;
+  snapshot();
+  const copy = cloneNode(hit.node);
+  hit.list.splice(hit.index + 1, 0, copy);
+  selectedId = copy.id;
+  commit();
+  track('element_duplicate');
+}
+
+/** Enable / disable the edit commands that need a selection or a clipboard. */
+function updateEditActions() {
+  const sel = !!(project && selectedId && find(selectedId));
+  document.querySelectorAll('[data-action="copy"], [data-action="cut"], [data-action="duplicate"], [data-action="delete"]')
+    .forEach((b) => { b.disabled = !sel; });
+  document.querySelectorAll('[data-action="paste"]').forEach((b) => { b.disabled = !clipboard; });
 }
 
 function deleteSelected() {
@@ -838,10 +963,22 @@ function toJava(list, ind) {
     switch (n.type) {
       case 'instruction':
       case 'call':
+      case 'jump':
         lines(n.text).forEach((l) => { out += `${p}${l.replace(/;$/, '')};\n`; });
         break;
+      case 'parallel': {
+        const ts = n.threads.map((t, i) => `t${ind}_${i + 1}`);
+        out += `${p}{ // ${n.text || 'parallel'}\n`;
+        n.threads.forEach((t, i) => {
+          out += `${p}    Thread ${ts[i]} = new Thread(() -> {\n${toJava(t, ind + 2)}${p}    });\n`;
+        });
+        out += `${p}    ${ts.map((t) => `${t}.start();`).join(' ')}\n`;
+        out += `${p}    try { ${ts.map((t) => `${t}.join();`).join(' ')} } catch (InterruptedException e) { }\n`;
+        out += `${p}}\n`;
+        break;
+      }
       case 'while': out += `${p}while (${n.text}) {\n${toJava(n.body, ind + 1)}${p}}\n`; break;
-      case 'for': out += `${p}for (${n.text}) {\n${toJava(n.body, ind + 1)}${p}}\n`; break;
+      case 'for': out += `${p}for (${javaFor(n.text)}) {\n${toJava(n.body, ind + 1)}${p}}\n`; break;
       case 'dowhile': out += `${p}do {\n${toJava(n.body, ind + 1)}${p}} while (${n.text});\n`; break;
       case 'if':
         out += `${p}if (${n.text}) {\n${toJava(n.yes, ind + 1)}${p}}`;
@@ -869,10 +1006,28 @@ function toPython(list, ind) {
     switch (n.type) {
       case 'instruction':
       case 'call':
+      case 'jump':
         lines(n.text).forEach((l) => { out += `${p}${l.replace(/;$/, '')}\n`; });
         break;
+      case 'parallel': {
+        const fs = n.threads.map((t, i) => `thread_${i + 1}`);
+        out += `${p}# ${n.text || 'parallel'}\n`;
+        n.threads.forEach((t, i) => { out += `${p}def ${fs[i]}():\n${toPython(t, ind + 1)}`; });
+        out += `${p}threads = [threading.Thread(target=f) for f in (${fs.join(', ')})]\n`;
+        out += `${p}for t in threads:\n${p}    t.start()\n${p}for t in threads:\n${p}    t.join()\n`;
+        break;
+      }
       case 'while': out += `${p}while ${n.text}:\n${toPython(n.body, ind + 1)}`; break;
-      case 'for': out += `${p}for ${n.text}:\n${toPython(n.body, ind + 1)}`; break;
+      case 'for': {
+        const f = parseFor(n.text);
+        if (f?.kind === 'c') { // C-style loop: init, then while with the update at the end
+          out += `${p}${f.init.replace(/^(?:int|long|var)\s+/, '')}\n${p}while ${f.cond}:\n`;
+          out += `${n.body.length ? toPython(n.body, ind + 1) : ''}${p}    ${f.update.replace(/(\w+)\+\+/, '$1 += 1').replace(/(\w+)--/, '$1 -= 1')}\n`;
+        } else {
+          out += `${p}for ${pythonFor(n.text)}:\n${toPython(n.body, ind + 1)}`;
+        }
+        break;
+      }
       case 'dowhile':
         out += `${p}while True:\n${toPython(n.body, ind + 1)}${p}    if not (${n.text}):\n${p}        break\n`;
         break;
@@ -891,10 +1046,51 @@ function toPython(list, ind) {
   return out;
 }
 
+/** Understand the text of a for loop.
+ *  range: "i = 1 to 10" (also bis/à/a, optional "step 2") · c: "int i = 0; i < n; i++" · in: "x in list" */
+function parseFor(text) {
+  const t = (text || '').trim().replace(/^\(|\)$/g, '');
+  const parts = t.split(';');
+  if (parts.length === 3) return { kind: 'c', init: parts[0].trim(), cond: parts[1].trim(), update: parts[2].trim() };
+  const m = /^(?:(?:int|long|var|let)\s+)?([A-Za-z_]\w*)\s*(?:=|:=|←|\bvon\b|\bfrom\b|\bde\b|\bda\b)\s*(.+?)\s+(?:bis|to|à|a|until|fino a|jusqu'à)\s+(.+?)(?:\s+(?:step|schritt|schrittweite|pas|passo)\s+(.+))?$/i.exec(t);
+  if (m) return { kind: 'range', v: m[1], from: m[2].trim(), to: m[3].trim(), step: (m[4] || '1').trim() };
+  const f = /^(?:(?:var|let|const|int|String|double)\s+)?([A-Za-z_]\w*)\s*(?:\bin\b|:)\s*(.+)$/.exec(t);
+  if (f) return { kind: 'in', v: f[1], iter: f[2].trim() };
+  return null;
+}
+
+const isNegative = (step) => /^\s*-/.test(step);
+
+function javaFor(text) {
+  const f = parseFor(text);
+  if (f?.kind === 'range') {
+    const neg = isNegative(f.step);
+    const upd = f.step === '1' ? `${f.v}++` : f.step === '-1' ? `${f.v}--` : `${f.v} += ${f.step}`;
+    return `int ${f.v} = ${f.from}; ${f.v} ${neg ? '>=' : '<='} ${f.to}; ${upd}`;
+  }
+  if (f?.kind === 'in') return `var ${f.v} : ${f.iter}`;
+  return text;
+}
+
+function pythonFor(text) {
+  const f = parseFor(text);
+  if (f?.kind === 'range') {
+    const neg = isNegative(f.step);
+    const end = /^-?\d+$/.test(f.to) ? String(Number(f.to) + (neg ? -1 : 1)) : `${f.to} ${neg ? '-' : '+'} 1`;
+    return `${f.v} in range(${f.from}, ${end}${f.step === '1' ? '' : `, ${f.step}`})`;
+  }
+  if (f?.kind === 'in') return `${f.v} in ${f.iter}`;
+  return text;
+}
+
 const ident = (s) => s.replace(/\W+/g, '_').replace(/^(\d)/, '_$1') || 'f';
 
 function generate(lang) {
-  return project.diagrams.map((d, i) => {
+  const usesThreads = lang === 'python' && project.diagrams.some((d) => {
+    const has = (list) => list.some((n) => n.type === 'parallel' || childLists(n).some(has));
+    return has(d.body);
+  });
+  return (usesThreads ? 'import threading\n\n' : '') + project.diagrams.map((d, i) => {
     const name = i === 0 ? 'main' : ident(d.name);
     return lang === 'java'
       ? `// ${d.name}\nvoid ${name}() {\n${toJava(d.body, 1)}}\n`
@@ -1016,7 +1212,7 @@ function showElementInfo(type) {
 
 function showHelp() {
   const div = document.createElement('div');
-  const keys = ['drag', 'select', 'move', 'keys', 'tabs', 'save'];
+  const keys = ['drag', 'select', 'move', 'keys', 'copy', 'tabs', 'run', 'save'];
   if (IS_TOUCH) keys.splice(3, 0, 'touch');
   const items = keys.map((k) => `<li>${tr(`help.${k}`)}</li>`).join('');
   div.innerHTML = `
@@ -1131,6 +1327,10 @@ const actions = {
   image: exportImage,
   undo, redo,
   delete: deleteSelected,
+  copy: copySelected,
+  cut: cutSelected,
+  paste: pasteClipboard,
+  duplicate: duplicateSelected,
   info: showHelp,
   privacy: showPrivacy,
 };
@@ -1150,7 +1350,14 @@ document.querySelectorAll('.menu').forEach((menu) => {
   });
 });
 document.addEventListener('click', () => document.querySelectorAll('.menu.open').forEach((m) => m.classList.remove('open')));
-document.querySelectorAll('[data-action]').forEach((b) => { b.onclick = () => actions[b.dataset.action](); });
+// Commands that don't change the diagram can be used during a run; anything else ends it first
+const RUN_SAFE_ACTIONS = new Set(['save', 'code', 'image', 'info', 'privacy', 'copy']);
+document.querySelectorAll('[data-action]').forEach((b) => {
+  b.onclick = () => {
+    if (runner && !runner.done && !RUN_SAFE_ACTIONS.has(b.dataset.action)) stopRun();
+    actions[b.dataset.action]();
+  };
+});
 
 $('#addTab').onclick = async () => {
   const n = project.diagrams.length;
@@ -1167,6 +1374,9 @@ $('#addTab').onclick = async () => {
 
 $('#collapseBtn').onclick = () => document.body.classList.toggle('collapsed');
 
+// Text selected on the page (e.g. in a dialog) keeps the browser's own copy
+const hasTextSelection = () => !!window.getSelection()?.toString();
+
 document.addEventListener('keydown', (e) => {
   const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
   const dialogOpen = document.querySelector('dialog[open]');
@@ -1174,8 +1384,18 @@ document.addEventListener('keydown', (e) => {
   if (mod && e.key.toLowerCase() === 's') { e.preventDefault(); if (project) saveFile(); return; }
   if (mod && e.key.toLowerCase() === 'o') { e.preventDefault(); $('#fileInput').click(); return; }
   if (typing || dialogOpen || !project) return;
+  if (runner && !runner.done) { // while running: step, stop – no editing
+    if (e.key === 'Escape') stopRun();
+    else if (e.key === 'F10' || e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); $('#runStep').click(); }
+    return;
+  }
+  if (mod && e.key === 'Enter') { e.preventDefault(); startRun(); return; }
   if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
   else if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
+  else if (mod && e.key.toLowerCase() === 'c' && !hasTextSelection()) { if (copySelected()) e.preventDefault(); }
+  else if (mod && e.key.toLowerCase() === 'x' && !hasTextSelection()) { e.preventDefault(); cutSelected(); }
+  else if (mod && e.key.toLowerCase() === 'v') { e.preventDefault(); pasteClipboard(); }
+  else if (mod && e.key.toLowerCase() === 'd') { e.preventDefault(); duplicateSelected(); }
   else if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deleteSelected(); }
   else if (e.key === 'Escape') select(null);
 });
