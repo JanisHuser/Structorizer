@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="style.css?v=18">
+  <link rel="stylesheet" href="style.css?v=20">
   <!-- Google Analytics with Consent Mode v2: nothing is loaded or stored until the visitor agrees (see consent in app.js) -->
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -37,6 +37,7 @@
       <div class="menu-items">
         <button data-action="new" data-i18n="action.new">Neues Projekt</button>
         <button data-action="open"><span data-i18n="action.open">Projekt/Datei öffnen</span> <kbd>Ctrl+O</kbd></button>
+        <button data-action="samples" data-i18n="action.samples">Beispiele…</button>
         <button data-action="save"><span data-i18n="action.save">Download</span> <kbd>Ctrl+S</kbd></button>
         <hr>
         <button data-action="code" data-i18n="action.code">Code exportieren</button>
@@ -119,6 +120,7 @@
         <button id="runClose" class="close" data-i18n-title="common.close">×</button>
       </header>
       <div class="run-controls">
+        <button id="runBack" data-i18n-title="run.backTitle" disabled><i>⏮</i> <span data-i18n="run.back">Zurück</span></button>
         <button id="runStep" title="F10 / →"><i>⏭</i> <span data-i18n="run.step">Schritt</span></button>
         <button id="runPlay" class="primary"><i>▶</i> <span data-i18n="run.play">Abspielen</span></button>
         <button id="runRestart" data-i18n-title="run.restart">↺</button>
@@ -142,6 +144,7 @@
     <button id="createBtn" data-i18n="start.create" disabled>Projekt erstellen</button>
     <h4 data-i18n="start.open">Projekt aus Datei öffnen:</h4>
     <button id="openBtn" data-i18n="start.choose">Datei auswählen…</button>
+    <button id="samplesBtn" data-i18n="start.samples">Beispiel öffnen…</button>
     <button id="lastBtn" class="primary" data-i18n="start.last">Zuletzt bearbeitetes Projekt laden</button>
   </dialog>
 
@@ -191,9 +194,10 @@
   <input type="file" id="fileInput" accept=".json,.struct" hidden>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
-  <script src="i18n.js?v=9"></script>
-  <script src="app.js?v=13"></script>
+  <script src="i18n.js?v=12"></script>
+  <script src="app.js?v=15"></script>
   <script src="codegen.js?v=1"></script>
-  <script src="run.js?v=2"></script>
+  <script src="run.js?v=5"></script>
+  <script src="samples.js?v=1"></script>
 </body>
 </html>

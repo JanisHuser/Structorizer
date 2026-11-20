@@ -36,7 +36,10 @@ function outsideStrings(code, fn) {
 }
 
 function toJs(code) {
-  return outsideStrings(code.trim().replace(/;\s*$/, ''), (t) => t
+  // function diagrams called inside an expression (e.g. "k * fact(k - 1)") are awaited
+  const fns = project.diagrams.slice(1).map((d) => signature(d).name);
+  const fnCall = fns.length ? new RegExp(`(^|[^.\\w])(${fns.join('|')})\\s*\\(`, 'g') : null;
+  return outsideStrings(code.trim().replace(/;\s*$/, ''), (t) => (fnCall ? t.replace(fnCall, '$1await $2(') : t)
     // declarations: "int a = 1" → "a = 1"
     .replace(new RegExp(`\\b(?:${TYPES})(?:\\s*\\[\\s*\\])?\\s+(?=[A-Za-z_]\\w*\\s*(?:=|;|,|$))`, 'g'), '')
     .replace(/:=|←/g, '=')
@@ -76,7 +79,14 @@ function show(v, quoted = false) {
 /** Text typed by the user: numbers become numbers (for input()). */
 const autoNumber = (s) => (s.trim() !== '' && Number.isFinite(Number(s)) ? Number(s) : s);
 
-function makeScope(vars) {
+/** Recorded value for replay, or a new one from make() that is recorded for the next replay. */
+function recorded(list, pos, make) {
+  return pos < list.length ? list[pos] : (list[pos] = make());
+}
+
+/* R: the runner this scope belongs to. Inputs and random numbers are recorded on it so that
+   stepping back (which replays the run from the start) gets exactly the same values again. */
+function makeScope(vars, R) {
   const println = (...a) => print(a.map((x) => show(x)).join(' ') + '\n');
   const out = {
     println,
@@ -84,7 +94,7 @@ function makeScope(vars) {
     printf: (f, ...a) => print(format(f, a)),
   };
   const ask = async (p, kind) => {
-    const v = (await askInput(p)) ?? '';
+    const v = (await askInput(p, R)) ?? '';
     if (kind === 'number') {
       if (!Number.isFinite(Number(v)) || v.trim() === '') throw new RunError(tr('run.notNumber', { value: v }));
       return Number(v);
@@ -92,8 +102,11 @@ function makeScope(vars) {
     return kind === 'text' ? v : autoNumber(v);
   };
   const input = (p) => ask(p, 'auto');
+  const random = () => recorded(R.randoms, R.randomPos++, Math.random);
+  // Math with a recorded random(); the other functions don't use `this`, so inheriting works
+  const math = Object.create(Math, { random: { value: random } });
   const builtins = {
-    Math, Number, Boolean, Array, JSON, Object, parseInt, parseFloat, isNaN, isFinite,
+    Math: math, Number, Boolean, Array, JSON, Object, parseInt, parseFloat, isNaN, isFinite,
     undefined, NaN, Infinity,
     String: Object.assign((x) => String(x), { valueOf: (x) => String(x), format: (f, ...a) => format(f, a) }),
     Integer: { parseInt: (s) => parseInt(s, 10), MAX_VALUE: 2147483647, MIN_VALUE: -2147483648 },
@@ -105,7 +118,7 @@ function makeScope(vars) {
     input, eingabe: input, lire: input, leggi: input,
     inputText: (p) => ask(p, 'text'), inputNumber: (p) => ask(p, 'number'),
     len: (x) => x.length, str: (x) => show(x), int: (x) => Math.trunc(Number(x)), float: Number,
-    abs: Math.abs, round: Math.round, min: Math.min, max: Math.max, sqrt: Math.sqrt, pow: Math.pow, random: Math.random,
+    abs: Math.abs, round: Math.round, min: Math.min, max: Math.max, sqrt: Math.sqrt, pow: Math.pow, random,
     range: (a, b, s = 1) => {
       if (b === undefined) { b = a; a = 0; }
       const r = [];
@@ -113,15 +126,26 @@ function makeScope(vars) {
       return r;
     },
   };
+  // parameters of the function that is running live in its own frame (so recursion works)
+  const frame = () => R.frames[R.frames.length - 1];
   return new Proxy(vars, {
     has: (t, k) => typeof k === 'string', // every name is looked up here, never on window
     get: (t, k) => {
       if (typeof k !== 'string') return undefined;
+      const f = frame();
+      if (f && Object.hasOwn(f, k)) return f[k];
       if (Object.hasOwn(t, k)) return t[k];
+      const idx = functionIndex(k);
+      if (idx > 0) return (...args) => callFunction(idx, args);
       if (Object.hasOwn(builtins, k)) return builtins[k];
       throw new RunError(tr('run.undefinedVar', { name: k }));
     },
-    set: (t, k, v) => { t[k] = v; return true; },
+    set: (t, k, v) => {
+      const f = frame();
+      if (f && Object.hasOwn(f, k)) f[k] = v;
+      else t[k] = v;
+      return true;
+    },
   });
 }
 
@@ -303,17 +327,34 @@ async function jump(n) {
   throw new Jump('exit');
 }
 
+/** Index of the function diagram with this name (> 0), or -1. */
+function functionIndex(name) {
+  return project.diagrams.findIndex((d, i) => i > 0 && signature(d).name === name);
+}
+
+/** A new frame with the function's parameters set to the argument values. */
+function pushFrame(idx, values) {
+  const R = runner;
+  if (R.depth > 200) throw new RunError(tr('run.tooDeep'));
+  const { params } = signature(project.diagrams[idx]);
+  R.frames.push(Object.fromEntries(params.map((p, i) => [p, values[i]])));
+  R.depth++;
+}
+
+function popFrame(R) {
+  R.depth--;
+  R.frames.pop();
+}
+
+/** Call element: steps into the function diagram (shown step by step). */
 async function* callNode(n) {
   const m = /^\s*(?:(?:[A-Za-z_]\w*\s+)?([A-Za-z_]\w*)\s*=\s*)?([A-Za-z_]\w*)\s*\((.*)\)\s*;?\s*$/.exec(n.text);
-  const idx = m ? project.diagrams.findIndex((d, i) => i > 0 && signature(d).name === m[2]) : -1;
+  const idx = m ? functionIndex(m[2]) : -1;
   if (idx < 0) { await execText(n.text, n); return; } // not one of our diagrams: plain code
-  if (runner.depth > 200) throw new RunError(tr('run.tooDeep'), n);
-  const { params } = signature(project.diagrams[idx]);
-  const args = splitTop(m[3], ',').filter((a) => a.trim());
   const values = [];
-  for (const a of args) values.push(await evalText(a, n));
-  params.forEach((p, i) => { runner.vars[p] = values[i]; });
-  runner.depth++;
+  for (const a of splitTop(m[3], ',').filter((x) => x.trim())) values.push(await evalText(a, n));
+  const R = runner;
+  try { pushFrame(idx, values); } catch (e) { e.node = n; throw e; }
   let value;
   try {
     yield* execList(project.diagrams[idx].body);
@@ -321,9 +362,29 @@ async function* callNode(n) {
     if (e instanceof Jump && e.kind === 'return') value = e.value;
     else throw e;
   } finally {
-    runner.depth--;
+    popFrame(R);
   }
-  if (m[1]) runner.vars[m[1]] = value;
+  if (m[1]) R.scope[m[1]] = value; // assigned like any other variable (local if it is a parameter)
+}
+
+/** Function called inside an expression, e.g. "k * fact(k - 1)": runs to the end within the
+    current step (its elements are not shown one by one). */
+async function callFunction(idx, values) {
+  const R = runner;
+  pushFrame(idx, values);
+  try {
+    const g = execList(project.diagrams[idx].body);
+    for (;;) {
+      if (++R.inner > MAX_STEPS) throw new RunError(tr('run.tooMany', { n: MAX_STEPS }));
+      if ((await g.next()).done) break;
+    }
+  } catch (e) {
+    if (e instanceof Jump && e.kind === 'return') return e.value;
+    throw e;
+  } finally {
+    popFrame(R);
+  }
+  return undefined;
 }
 
 async function* program(list) {
@@ -336,17 +397,41 @@ async function* program(list) {
 
 /* ---------------- runner ---------------- */
 
-/** Input during a run uses the app's question dialog. */
-function askInput(promptText) {
-  return ask(promptText ? show(promptText) : tr('run.input'), '');
+/** Input during a run uses the app's question dialog – unless the answer was recorded
+    earlier in this run (replay after stepping back), then it is given again without asking. */
+async function askInput(promptText, R) {
+  if (R.inputPos < R.inputs.length) return R.inputs[R.inputPos++];
+  const v = await ask(promptText ? show(promptText) : tr('run.input'), '');
+  if (runner === R) R.inputs[R.inputPos++] = v;
+  return v;
 }
 
 function print(text) {
   if (!runner) return;
   runner.out += text;
+  if (runner.replaying) return; // written once when the replay is done
+  showOutput();
+}
+
+function showOutput() {
   const o = $('#runOutput');
   o.textContent = runner.out;
   o.scrollTop = o.scrollHeight;
+}
+
+/** Fresh run state at step 0. rec: earlier runner whose recorded inputs / random numbers are
+    shared (stepping back), so going forward again replays them before asking for new ones. */
+function newRunner(home, owner, source, rec) {
+  const vars = {};
+  const R = {
+    home, owner, source, vars, scope: null, gen: null, steps: 0, depth: 0,
+    playing: false, busy: false, done: false, replaying: false, current: null, error: null, out: '', prev: {},
+    inputs: rec ? rec.inputs : [], randoms: rec ? rec.randoms : [], inputPos: 0, randomPos: 0,
+    frames: [], inner: 0, // parameters of running functions; steps inside expression calls
+  };
+  R.scope = makeScope(vars, R);
+  R.gen = program(project.diagrams[home].body);
+  return R;
 }
 
 function startRun() {
@@ -357,12 +442,8 @@ function startRun() {
     const walk = (l) => l.forEach((n) => { owner.set(n.id, i); childLists(n).forEach(walk); });
     walk(d.body);
   });
-  const vars = {};
-  runner = {
-    home, owner, vars, scope: makeScope(vars), gen: null, steps: 0, depth: 0,
-    playing: false, busy: false, done: false, current: null, error: null, out: '', prev: {},
-  };
-  runner.gen = program(project.diagrams[home].body);
+  // the diagrams as they were run: stepping back after the end is only possible while unchanged
+  runner = newRunner(home, owner, JSON.stringify(project.diagrams), null);
   select(null);
   document.body.classList.add('running');
   $('#runPanel').hidden = false;
@@ -371,11 +452,63 @@ function startRun() {
   step();
 }
 
+/** Can the run go back one step? (Also after it finished or failed, if nothing was edited since.) */
+function canStepBack() {
+  const R = runner;
+  if (!R || R.busy || R.steps < 2) return false;
+  return !R.done || JSON.stringify(project.diagrams) === R.source;
+}
+
+/* Step back: async generators can't be rewound, so the run is replayed from the start up to the
+   step before, quietly (no drawing, no delays), with the recorded inputs and random numbers. */
+async function stepBack() {
+  const old = runner;
+  if (!old) return;
+  if (old.playing) {
+    pause();
+    renderRunState();
+    while (runner === old && old.busy) await sleep(20); // let the step that is running finish
+    if (runner !== old) return;
+  }
+  if (!canStepBack()) { renderRunState(); return; }
+  const target = old.steps - 1;
+  old.busy = true;
+  // let the old generator finish first: its finally blocks still use the global runner
+  await old.gen.return().catch(() => {});
+  if (runner !== old) return; // stopped or restarted meanwhile
+  const R = newRunner(old.home, old.owner, old.source, old);
+  R.busy = R.replaying = true;
+  runner = R;
+  let error = null;
+  try {
+    while (R.steps < target) {
+      // variables before the last step: "changed" marks what that step changed
+      if (R.steps === target - 1) R.prev = varSnapshot(visibleVars(R));
+      R.steps++;
+      const r = await R.gen.next();
+      if (runner !== R) return; // stopped during the replay
+      if (r.done) { R.current = null; break; } // can't happen with the same diagram and inputs
+      R.current = r.value;
+    }
+  } catch (e) {
+    error = e;
+  }
+  if (runner !== R) return;
+  R.busy = R.replaying = false;
+  select(null);
+  document.body.classList.add('running');
+  showOutput();
+  if (error) failRun(error);
+  else if (!R.current) finishRun();
+  else { showStep(); renderRunState(); }
+}
+
 /** Run one element. quiet: don't redraw (used when running at full speed). */
 async function step(quiet = false) {
   const R = runner;
   if (!R || R.done || R.busy) return;
   R.busy = true;
+  const inputsBefore = R.inputPos;
   try {
     if (++R.steps > MAX_STEPS) throw new RunError(tr('run.tooMany', { n: MAX_STEPS }), R.current);
     const r = await R.gen.next();
@@ -386,7 +519,11 @@ async function step(quiet = false) {
       if (!quiet) showStep();
     }
   } catch (e) {
-    if (runner === R) failRun(e);
+    if (runner === R) {
+      // an answer given in the failing step (e.g. not a number) is asked again after stepping back
+      R.inputs.length = Math.min(R.inputs.length, inputsBefore);
+      failRun(e);
+    }
   } finally {
     R.busy = false;
   }
@@ -457,6 +594,7 @@ function stopRun() {
     backHome();
   }
   runner = null;
+  $('#runBack').disabled = true;
   highlightRun();
 }
 
@@ -494,7 +632,8 @@ function highlightRun() {
 function renderVars() {
   if (!runner) return;
   const table = $('#runVars');
-  const names = Object.keys(runner.vars);
+  const vars = visibleVars(runner);
+  const names = Object.keys(vars);
   table.replaceChildren();
   if (!names.length) {
     const empty = document.createElement('caption');
@@ -502,13 +641,23 @@ function renderVars() {
     table.append(empty);
   }
   names.forEach((k) => {
-    const v = show(runner.vars[k], true);
+    const v = show(vars[k], true);
     const tr_ = table.insertRow();
     if (runner.prev[k] !== v) tr_.className = 'changed';
     tr_.insertCell().textContent = k;
     tr_.insertCell().textContent = v;
   });
-  runner.prev = Object.fromEntries(names.map((k) => [k, show(runner.vars[k], true)]));
+  runner.prev = varSnapshot(vars);
+}
+
+/** Variables shown: the global ones plus the parameters of the function that is running. */
+function visibleVars(R) {
+  return { ...R.vars, ...R.frames[R.frames.length - 1] };
+}
+
+/** Variables as shown, to find the ones that changed. */
+function varSnapshot(vars) {
+  return Object.fromEntries(Object.keys(vars).map((k) => [k, show(vars[k], true)]));
 }
 
 function renderRunState() {
@@ -516,6 +665,7 @@ function renderRunState() {
   const active = R && !R.done;
   $('#runStep').disabled = !active;
   $('#runPlay').disabled = !active;
+  $('#runBack').disabled = !canStepBack();
   $('#runPlay').querySelector('span').textContent = tr(R?.playing ? 'run.pause' : 'run.play');
   $('#runPlay').querySelector('i').textContent = R?.playing ? '⏸' : '▶';
   const status = $('#runStatus');
@@ -534,6 +684,7 @@ function renderRunState() {
 }
 
 $('#runBtn').onclick = startRun;
+$('#runBack').onclick = stepBack;
 $('#runStep').onclick = () => { if (runner?.playing) pause(); else step(); };
 $('#runPlay').onclick = play;
 $('#runRestart').onclick = startRun;

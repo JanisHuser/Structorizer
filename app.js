@@ -162,6 +162,7 @@ function commit() {
   document.title = `${project.title} – Structorizer`;
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(project)); } catch (e) { /* ignore */ }
   render();
+  if (runner?.done) renderRunState(); // Back after the end of a run is only possible while unchanged
 }
 
 function undo() {
@@ -1214,6 +1215,7 @@ $('#createBtn').onclick = () => {
   track('project_create');
 };
 $('#openBtn').onclick = () => $('#fileInput').click();
+$('#samplesBtn').onclick = () => showSamples();
 $('#lastBtn').onclick = () => {
   try {
     loadProject(JSON.parse(localStorage.getItem(STORAGE_KEY)));
@@ -1242,6 +1244,7 @@ $('#langSelect').onchange = (e) => setLanguage(e.target.value);
 
 const actions = {
   new: showStart,
+  samples: () => showSamples(),
   open: () => $('#fileInput').click(),
   save: saveFile,
   code: showCode,
@@ -1308,8 +1311,11 @@ document.addEventListener('keydown', (e) => {
   if (runner && !runner.done) { // while running: step, stop – no editing
     if (e.key === 'Escape') stopRun();
     else if (e.key === 'F10' || e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); $('#runStep').click(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); stepBack(); }
     return;
   }
+  // finished or failed run: ← goes back to look at earlier steps (no other key is taken over)
+  if (runner && e.key === 'ArrowLeft' && !mod && canStepBack()) { e.preventDefault(); stepBack(); return; }
   if (mod && e.key === 'Enter') { e.preventDefault(); startRun(); return; }
   if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
   else if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }

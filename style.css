@@ -351,13 +351,23 @@ body.collapsed .collapse .arrow { font-size: 18px; transform: rotate(180deg); }
 }
 @media (hover: hover) { #runPanel .close:hover { background: var(--hover); color: var(--text); } }
 #runPanel h3 { margin: 10px 0 0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
-.run-controls { display: flex; gap: 6px; }
+.run-controls { display: flex; gap: 6px; container-type: inline-size; }
 .run-controls button {
   display: flex; align-items: center; justify-content: center; gap: 6px; flex: 1; padding: 8px 6px; border-radius: 8px;
   border: 1px solid var(--border); background: var(--surface); font-weight: 600; font-size: 13px; white-space: nowrap;
 }
 .run-controls button i { font-style: normal; font-size: 11px; }
 .run-controls #runRestart { flex: 0 0 38px; font-size: 16px; }
+/* Not enough room for four labels (the sidebar, half of the bottom panel): Back and Step show
+   only their icons (the tooltip names them), Play keeps its label as long as it fits */
+@container (max-width: 330px) {
+  #runBack span, #runStep span { display: none; }
+  #runBack, #runStep { flex: 0 0 42px; }
+}
+@container (max-width: 240px) {
+  #runPlay span { display: none; }
+  .run-controls button { padding: 8px 4px; }
+}
 @media (hover: hover) { .run-controls button:not(:disabled):hover { background: var(--hover); } }
 .run-controls .primary:not(:disabled), .run-controls .primary:not(:disabled):hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 .run-controls button:disabled { opacity: .45; cursor: default; }
@@ -504,6 +514,15 @@ dialog.info .close {
   font: 13px/1.6 "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 #infoBody .hint { color: var(--muted); font-size: 13px; }
+.sample-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.sample {
+  display: flex; flex-direction: column; gap: 3px; text-align: left; padding: 11px 13px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--surface-2);
+}
+.sample b { font-size: 14px; }
+.sample span { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+@media (hover: hover) { .sample:hover { border-color: var(--accent); background: var(--accent-soft); } }
+@media (hover: none) { .sample:active { border-color: var(--accent); background: var(--accent-soft); } }
 .insert-btn {
   padding: 8px 16px; border-radius: 9px; border: 0; font-weight: 600; background: var(--accent); color: #fff;
 }
