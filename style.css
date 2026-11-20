@@ -451,7 +451,7 @@ dialog.info .close:hover { background: var(--hover); color: var(--text); }
 }
 .menu-items kbd { border: 0; background: none; padding: 0; }
 #infoBody pre {
-  background: #14161b; color: #e6e8ee; padding: 14px 16px; overflow: auto; margin: 10px 0 0; border-radius: 10px;
+  background: #14161b; color: #e6e8ee; padding: 14px 16px; overflow: auto; margin: 10px 0 0; border-radius: 10px; max-height: 58vh;
   font: 13px/1.6 "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 #infoBody .hint { color: var(--muted); font-size: 13px; }
@@ -463,6 +463,13 @@ dialog.info .close:hover { background: var(--hover); color: var(--text); }
 .code-tabs button { border: 0; background: none; padding: 5px 12px; border-radius: 7px; font-weight: 500; color: var(--muted); }
 .code-tabs button:hover { color: var(--text); }
 .code-tabs button.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+.code-box { position: relative; }
+.code-box pre { padding-right: 90px !important; }
+.code-box .copy-btn {
+  position: absolute; top: 8px; right: 8px; padding: 5px 10px; border-radius: 7px; font-size: 12px; font-weight: 500;
+  border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); color: #c9cdd6;
+}
+.code-box .copy-btn:hover { background: rgba(255,255,255,.14); color: #fff; }
 
 /* Short windows: compact palette so all elements stay reachable */
 @media (max-height: 640px) {

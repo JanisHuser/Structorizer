@@ -957,166 +957,31 @@ document.addEventListener('dblclick', (e) => {
   if (e.isTrusted && Date.now() - syntheticDblAt < 800) e.stopImmediatePropagation();
 }, true);
 
-/* ---------------- code export ---------------- */
-
-const lines = (t) => (t || '').split('\n').filter((l) => l.trim());
-const isDefault = (c) => c.auto || /^(sonst|default|else|otherwise|sinon|altrimenti|_)$/i.test(c.label.trim());
-
-function toJava(list, ind) {
-  const p = '    '.repeat(ind);
-  let out = '';
-  for (const n of list) {
-    switch (n.type) {
-      case 'instruction':
-      case 'call':
-      case 'jump':
-        lines(n.text).forEach((l) => { out += `${p}${l.replace(/;$/, '')};\n`; });
-        break;
-      case 'parallel': {
-        const ts = n.threads.map((t, i) => `t${ind}_${i + 1}`);
-        out += `${p}{ // ${n.text || 'parallel'}\n`;
-        n.threads.forEach((t, i) => {
-          out += `${p}    Thread ${ts[i]} = new Thread(() -> {\n${toJava(t, ind + 2)}${p}    });\n`;
-        });
-        out += `${p}    ${ts.map((t) => `${t}.start();`).join(' ')}\n`;
-        out += `${p}    try { ${ts.map((t) => `${t}.join();`).join(' ')} } catch (InterruptedException e) { }\n`;
-        out += `${p}}\n`;
-        break;
-      }
-      case 'while': out += `${p}while (${n.text}) {\n${toJava(n.body, ind + 1)}${p}}\n`; break;
-      case 'for': out += `${p}for (${javaFor(n.text)}) {\n${toJava(n.body, ind + 1)}${p}}\n`; break;
-      case 'dowhile': out += `${p}do {\n${toJava(n.body, ind + 1)}${p}} while (${n.text});\n`; break;
-      case 'if':
-        out += `${p}if (${n.text}) {\n${toJava(n.yes, ind + 1)}${p}}`;
-        out += n.no.length ? ` else {\n${toJava(n.no, ind + 1)}${p}}\n` : '\n';
-        break;
-      case 'switch':
-        out += `${p}switch (${n.text}) {\n`;
-        n.cases.forEach((c) => {
-          out += isDefault(c) ? `${p}    default:\n` : `${p}    case ${c.label}:\n`;
-          out += toJava(c.body, ind + 2);
-          if (!isDefault(c)) out += `${p}        break;\n`;
-        });
-        out += `${p}}\n`;
-        break;
-    }
-  }
-  return out;
-}
-
-function toPython(list, ind) {
-  const p = '    '.repeat(ind);
-  if (!list.length) return `${p}pass\n`;
-  let out = '';
-  for (const n of list) {
-    switch (n.type) {
-      case 'instruction':
-      case 'call':
-      case 'jump':
-        lines(n.text).forEach((l) => { out += `${p}${l.replace(/;$/, '')}\n`; });
-        break;
-      case 'parallel': {
-        const fs = n.threads.map((t, i) => `thread_${i + 1}`);
-        out += `${p}# ${n.text || 'parallel'}\n`;
-        n.threads.forEach((t, i) => { out += `${p}def ${fs[i]}():\n${toPython(t, ind + 1)}`; });
-        out += `${p}threads = [threading.Thread(target=f) for f in (${fs.join(', ')})]\n`;
-        out += `${p}for t in threads:\n${p}    t.start()\n${p}for t in threads:\n${p}    t.join()\n`;
-        break;
-      }
-      case 'while': out += `${p}while ${n.text}:\n${toPython(n.body, ind + 1)}`; break;
-      case 'for': {
-        const f = parseFor(n.text);
-        if (f?.kind === 'c') { // C-style loop: init, then while with the update at the end
-          out += `${p}${f.init.replace(/^(?:int|long|var)\s+/, '')}\n${p}while ${f.cond}:\n`;
-          out += `${n.body.length ? toPython(n.body, ind + 1) : ''}${p}    ${f.update.replace(/(\w+)\+\+/, '$1 += 1').replace(/(\w+)--/, '$1 -= 1')}\n`;
-        } else {
-          out += `${p}for ${pythonFor(n.text)}:\n${toPython(n.body, ind + 1)}`;
-        }
-        break;
-      }
-      case 'dowhile':
-        out += `${p}while True:\n${toPython(n.body, ind + 1)}${p}    if not (${n.text}):\n${p}        break\n`;
-        break;
-      case 'if':
-        out += `${p}if ${n.text}:\n${toPython(n.yes, ind + 1)}`;
-        if (n.no.length) out += `${p}else:\n${toPython(n.no, ind + 1)}`;
-        break;
-      case 'switch':
-        out += `${p}match ${n.text}:\n`;
-        n.cases.forEach((c) => {
-          out += `${p}    case ${isDefault(c) ? '_' : c.label}:\n${toPython(c.body, ind + 2)}`;
-        });
-        break;
-    }
-  }
-  return out;
-}
-
-/** Understand the text of a for loop.
- *  range: "i = 1 to 10" (also bis/à/a, optional "step 2") · c: "int i = 0; i < n; i++" · in: "x in list" */
-function parseFor(text) {
-  const t = (text || '').trim().replace(/^\(|\)$/g, '');
-  const parts = t.split(';');
-  if (parts.length === 3) return { kind: 'c', init: parts[0].trim(), cond: parts[1].trim(), update: parts[2].trim() };
-  const m = /^(?:(?:int|long|var|let)\s+)?([A-Za-z_]\w*)\s*(?:=|:=|←|\bvon\b|\bfrom\b|\bde\b|\bda\b)\s*(.+?)\s+(?:bis|to|à|a|until|fino a|jusqu'à)\s+(.+?)(?:\s+(?:step|schritt|schrittweite|pas|passo)\s+(.+))?$/i.exec(t);
-  if (m) return { kind: 'range', v: m[1], from: m[2].trim(), to: m[3].trim(), step: (m[4] || '1').trim() };
-  const f = /^(?:(?:var|let|const|int|String|double)\s+)?([A-Za-z_]\w*)\s*(?:\bin\b|:)\s*(.+)$/.exec(t);
-  if (f) return { kind: 'in', v: f[1], iter: f[2].trim() };
-  return null;
-}
-
-const isNegative = (step) => /^\s*-/.test(step);
-
-function javaFor(text) {
-  const f = parseFor(text);
-  if (f?.kind === 'range') {
-    const neg = isNegative(f.step);
-    const upd = f.step === '1' ? `${f.v}++` : f.step === '-1' ? `${f.v}--` : `${f.v} += ${f.step}`;
-    return `int ${f.v} = ${f.from}; ${f.v} ${neg ? '>=' : '<='} ${f.to}; ${upd}`;
-  }
-  if (f?.kind === 'in') return `var ${f.v} : ${f.iter}`;
-  return text;
-}
-
-function pythonFor(text) {
-  const f = parseFor(text);
-  if (f?.kind === 'range') {
-    const neg = isNegative(f.step);
-    const end = /^-?\d+$/.test(f.to) ? String(Number(f.to) + (neg ? -1 : 1)) : `${f.to} ${neg ? '-' : '+'} 1`;
-    return `${f.v} in range(${f.from}, ${end}${f.step === '1' ? '' : `, ${f.step}`})`;
-  }
-  if (f?.kind === 'in') return `${f.v} in ${f.iter}`;
-  return text;
-}
-
-const ident = (s) => s.replace(/\W+/g, '_').replace(/^(\d)/, '_$1') || 'f';
-
-function generate(lang) {
-  const usesThreads = lang === 'python' && project.diagrams.some((d) => {
-    const has = (list) => list.some((n) => n.type === 'parallel' || childLists(n).some(has));
-    return has(d.body);
-  });
-  return (usesThreads ? 'import threading\n\n' : '') + project.diagrams.map((d, i) => {
-    const name = i === 0 ? 'main' : ident(d.name);
-    return lang === 'java'
-      ? `// ${d.name}\nvoid ${name}() {\n${toJava(d.body, 1)}}\n`
-      : `# ${d.name}\ndef ${name}():\n${toPython(d.body, 1)}`;
-  }).join('\n');
-}
+/* ---------------- code export (generators in codegen.js) ---------------- */
 
 function showCode() {
   const body = document.createElement('div');
   const tabs = document.createElement('div');
   tabs.className = 'code-tabs';
+  // code block with the copy button in its top right corner
+  const box = document.createElement('div');
+  box.className = 'code-box';
   const pre = document.createElement('pre');
-  const langs = { java: 'Java / C', python: 'Python' };
+  const langs = { java: 'Java', python: 'Python' };
   let current = 'java';
   const show = (lang) => {
     current = lang;
     track('code_export', { code_language: lang });
-    pre.textContent = generate(lang);
+    try {
+      pre.textContent = generate(lang);
+    } catch (e) {
+      pre.textContent = `// ${e.message}`;
+    }
+    copy.textContent = tr('code.copy');
     tabs.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.dataset.lang === lang));
   };
+  const copy = document.createElement('button');
+  copy.className = 'copy-btn';
   Object.entries(langs).forEach(([k, v]) => {
     const b = document.createElement('button');
     b.textContent = v;
@@ -1124,14 +989,12 @@ function showCode() {
     b.onclick = () => show(k);
     tabs.append(b);
   });
-  const copy = document.createElement('button');
-  copy.textContent = tr('code.copy');
   copy.onclick = () => {
     track('code_copy', { code_language: current });
     navigator.clipboard?.writeText(pre.textContent).then(() => { copy.textContent = tr('code.copied'); });
   };
-  tabs.append(copy);
-  body.append(tabs, pre);
+  box.append(pre, copy);
+  body.append(tabs, box);
   show('java');
   openInfo(tr('action.code'), body);
 }

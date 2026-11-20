@@ -303,35 +303,13 @@ async function jump(n) {
   throw new Jump('exit');
 }
 
-/** Name and parameters of a diagram called like a function, e.g. "max(a, b)". */
-function signature(d) {
-  const m = /^\s*([A-Za-z_]\w*)\s*\((.*)\)\s*$/.exec(d.name);
-  return m
-    ? { name: m[1], params: m[2].split(',').map((p) => p.trim().split(/\s+/).pop()).filter(Boolean) }
-    : { name: ident(d.name), params: [] };
-}
-
-/** Split call arguments at top-level commas. */
-function splitArgs(s) {
-  const out = [];
-  let depth = 0;
-  let cur = '';
-  for (const ch of outsideStrings(s, (t) => t.replace(/,/g, '\u0000'))) {
-    if ('([{'.includes(ch)) depth++;
-    if (')]}'.includes(ch)) depth--;
-    if (ch === '\u0000' && depth === 0) { out.push(cur); cur = ''; } else cur += ch === '\u0000' ? ',' : ch;
-  }
-  if (cur.trim()) out.push(cur);
-  return out;
-}
-
 async function* callNode(n) {
   const m = /^\s*(?:(?:[A-Za-z_]\w*\s+)?([A-Za-z_]\w*)\s*=\s*)?([A-Za-z_]\w*)\s*\((.*)\)\s*;?\s*$/.exec(n.text);
   const idx = m ? project.diagrams.findIndex((d, i) => i > 0 && signature(d).name === m[2]) : -1;
   if (idx < 0) { await execText(n.text, n); return; } // not one of our diagrams: plain code
   if (runner.depth > 200) throw new RunError(tr('run.tooDeep'), n);
   const { params } = signature(project.diagrams[idx]);
-  const args = splitArgs(m[3]);
+  const args = splitTop(m[3], ',').filter((a) => a.trim());
   const values = [];
   for (const a of args) values.push(await evalText(a, n));
   params.forEach((p, i) => { runner.vars[p] = values[i]; });
