@@ -198,9 +198,10 @@ main { flex: 1; display: flex; min-height: 0; }
 .props #deleteBtn { width: 100%; margin-top: 8px; }
 .prop-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 10px; }
 .prop-actions button {
-  padding: 6px 2px; font-size: 12px; font-weight: 500; border: 1px solid var(--border); border-radius: 7px;
-  background: var(--surface); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  display: grid; place-items: center; height: 34px; padding: 0; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface); color: var(--muted);
 }
+@media (pointer: coarse) { .prop-actions button { height: 40px; } }
 @media (hover: hover) { .prop-actions button:not(:disabled):hover { background: var(--accent-soft); color: var(--accent-text); border-color: transparent; } }
 .prop-actions button:disabled, .menu-items button:disabled { opacity: .4; cursor: default; }
 .menu-items button:disabled:hover { background: none; }
@@ -456,6 +457,18 @@ dialog::backdrop { background: rgba(15, 17, 21, .35); backdrop-filter: blur(4px)
 @media (hover: hover) { .ask-actions button:hover { background: var(--hover); } }
 .ask-actions .primary, .ask-actions .primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 
+#editDialog { width: min(520px, calc(100vw - 32px)); padding: 20px; margin-top: max(24px, 8vh); }
+#editDialog h4 { margin: 0 0 4px; font-size: 16px; }
+#editDialog label { display: block; margin-bottom: 10px; font-size: 13px; color: var(--muted); }
+#editDialog textarea {
+  display: block; width: 100%; padding: 12px; font: 16px/1.5 "JetBrains Mono", ui-monospace, Menlo, monospace; color: var(--text);
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; outline: none; resize: vertical;
+}
+#editDialog textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+#editDialog .ask-actions button { min-width: 96px; padding: 10px 16px; }
+/* touch: the sidebar field just shows the text, tapping it opens the dialog */
+.props textarea[readonly] { cursor: pointer; }
+
 #consentDialog { width: min(420px, calc(100vw - 32px)); padding: 22px; }
 #consentDialog h4 { margin: 0 0 10px; font-size: 16px; }
 #consentDialog p { margin: 0 0 10px; line-height: 1.55; font-size: 13.5px; }
@@ -527,6 +540,10 @@ dialog.info .close {
    Hover effects only apply with a mouse/trackpad (@media (hover: hover)),
    otherwise they stay stuck after a tap. Touch gets a short press feedback.
    ========================================================= */
+/* iOS zooms into fields with text smaller than 16px – on any iOS device, also with a trackpad */
+@supports (-webkit-touch-callout: none) {
+  input, textarea, select { font-size: max(16px, 1em) !important; }
+}
 @media (hover: none) {
   .menu-items button:not(:disabled):active, .tool:active, .tab:active, .collapse:active, #langSelect:active,
   .props .small:active, .prop-actions button:not(:disabled):active, .run-controls button:not(:disabled):active,

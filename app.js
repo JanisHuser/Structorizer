@@ -520,6 +520,9 @@ function renderProps() {
     const row = document.createElement('div');
     row.className = 'case-row';
     const inp = document.createElement('input');
+    inp.setAttribute('autocapitalize', 'off');
+    inp.setAttribute('autocorrect', 'off');
+    inp.spellcheck = false;
     inp.value = c.label;
     inp.placeholder = i === node.cases.length - 1 ? tr('case.default') : tr('case.placeholder', { n: i + 1 });
     inp.setAttribute('aria-label', inp.placeholder);
@@ -697,9 +700,55 @@ $('#diagram').addEventListener('dblclick', (e) => {
   const el = e.target.closest('.el');
   if (!el) return;
   select(el.dataset.id);
+  if (IS_TOUCH) { editText(el.dataset.id); return; }
   $('#propText').focus();
   $('#propText').select();
 });
+
+/* ---------------- edit dialog (touch) ----------------
+   On iPad the small field in the sidebar is awkward (keyboard, zoom), so the text
+   is edited in a dialog near the top of the screen instead. */
+
+const MULTILINE = new Set(['instruction', 'call']); // Enter adds a line; elsewhere Enter saves
+
+function editText(id) {
+  const hit = id && find(id);
+  if (!hit) return;
+  const node = hit.node;
+  const dlg = $('#editDialog');
+  const ta = $('#editText');
+  $('#editTitle').textContent = tr(`el.${node.type}.name`);
+  $('#editLabel').textContent = tr(`field.${node.type}`);
+  ta.value = node.text;
+  ta.rows = MULTILINE.has(node.type) ? 4 : 2;
+  ta.dataset.multiline = MULTILINE.has(node.type);
+  dlg.returnValue = '';
+  dlg.showModal();
+  ta.focus();
+  ta.select();
+  dlg.addEventListener('close', () => {
+    if (dlg.returnValue !== 'ok') return;
+    const text = ta.value.replace(/\s+$/, '');
+    if (text === node.text) return;
+    snapshot();
+    node.text = text;
+    node.auto = false;
+    commit();
+  }, { once: true });
+}
+
+$('#editText').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey || e.target.dataset.multiline !== 'true') && !e.shiftKey) {
+    e.preventDefault();
+    $('#editDialog').close('ok');
+  }
+});
+
+// Touch: the sidebar field only shows the text; tapping it opens the dialog
+if (IS_TOUCH) {
+  $('#propText').readOnly = true;
+  $('#propText').addEventListener('click', () => editText(selectedId));
+}
 $('#canvas').addEventListener('click', (e) => { if (e.target.id === 'canvas') select(null); });
 $('#deleteBtn').onclick = deleteSelected;
 
@@ -1273,6 +1322,18 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ---------------- boot ---------------- */
+// iOS zooms into a text field when it gets focus; maximum-scale stops that
+// (pinch-zoom still works – iOS ignores it for the user's own zooming)
+if (IS_IOS) {
+  const vp = document.querySelector('meta[name="viewport"]');
+  vp.content += ', maximum-scale=1';
+}
+// Code fields: no auto-capitalising ("While") or autocorrect on iPad
+document.querySelectorAll('#propText, #askInput, #newTitle, #editText').forEach((f) => {
+  f.setAttribute('autocapitalize', 'off');
+  f.setAttribute('autocorrect', 'off');
+  f.spellcheck = false;
+});
 // iOS greys out files whose type it doesn't know (.struct), so allow picking any file there
 if (IS_IOS) $('#fileInput').removeAttribute('accept');
 // Offline support / installable web app

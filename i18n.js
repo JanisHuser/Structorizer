@@ -458,6 +458,9 @@ function translatePage() {
   document.documentElement.lang = lang;
   document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = tr(el.dataset.i18n); });
   document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => { el.placeholder = tr(el.dataset.i18nPlaceholder); });
-  document.querySelectorAll('[data-i18n-title]').forEach((el) => { el.title = tr(el.dataset.i18nTitle); });
+  document.querySelectorAll('[data-i18n-title]').forEach((el) => {
+    el.title = tr(el.dataset.i18nTitle);
+    if (!el.textContent.trim()) el.setAttribute('aria-label', el.title); // icon-only buttons
+  });
   document.querySelectorAll('[data-i18n-html]').forEach((el) => { el.innerHTML = tr(el.dataset.i18nHtml); });
 }

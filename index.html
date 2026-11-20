@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=15">
   <!-- Google Analytics with Consent Mode v2: nothing is loaded or stored until the visitor agrees (see consent in app.js) -->
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -97,9 +97,9 @@
         <label><span id="propLabel">Text</span> <textarea id="propText" rows="2"></textarea></label>
         <div id="caseProps"></div>
         <div class="prop-actions">
-          <button data-action="duplicate" data-i18n="action.duplicate">Duplizieren</button>
-          <button data-action="copy" data-i18n="action.copy">Kopieren</button>
-          <button data-action="paste" data-i18n="action.paste">Einfügen</button>
+          <button data-action="duplicate" data-i18n-title="action.duplicate"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M13 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M12 10v4M10 12h4"/></svg></button>
+          <button data-action="copy" data-i18n-title="action.copy"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M13 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/></svg></button>
+          <button data-action="paste" data-i18n-title="action.paste"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="12" height="13" rx="2"/><path d="M7.5 4V3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1"/><path d="M7.5 9h5M7.5 12h5"/></svg></button>
         </div>
         <button id="deleteBtn" class="danger" data-i18n="action.delete" disabled>Element löschen</button>
       </div>
@@ -162,6 +162,19 @@
     <div id="infoBody"></div>
   </dialog>
 
+  <!-- Edit element text (touch devices: instead of the small sidebar field) -->
+  <dialog id="editDialog">
+    <form method="dialog">
+      <h4 id="editTitle"></h4>
+      <label id="editLabel" for="editText"></label>
+      <textarea id="editText" rows="3"></textarea>
+      <div class="ask-actions">
+        <button value="ok" class="primary">OK</button>
+        <button value="cancel" formnovalidate data-i18n="common.cancel">Abbrechen</button>
+      </div>
+    </form>
+  </dialog>
+
   <!-- Small question dialog (replaces prompt / confirm, which some browsers block) -->
   <dialog id="askDialog">
     <form method="dialog">
@@ -178,8 +191,8 @@
   <input type="file" id="fileInput" accept=".json,.struct" hidden>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
-  <script src="i18n.js?v=8"></script>
-  <script src="app.js?v=12"></script>
+  <script src="i18n.js?v=9"></script>
+  <script src="app.js?v=13"></script>
   <script src="codegen.js?v=1"></script>
   <script src="run.js?v=2"></script>
 </body>
