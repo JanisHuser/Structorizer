@@ -9,6 +9,9 @@
 
 const STORAGE_KEY = 'structorizer-v2';
 const $ = (sel) => document.querySelector(sel);
+const IS_TOUCH = navigator.maxTouchPoints > 0;
+// iPadOS reports itself as a Mac
+const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
 
 /* ---------------- analytics & consent ----------------
    Google Analytics is only downloaded once the visitor accepts (gtag + consent
@@ -583,6 +586,7 @@ let indicator = null;     // element currently showing the insertion marker
 
 document.querySelectorAll('.tool').forEach((tool) => {
   tool.addEventListener('dragstart', (e) => {
+    if (touch) { e.preventDefault(); return; }
     dragData = { type: tool.dataset.type };
     e.dataTransfer.setData('text/plain', tool.dataset.type);
     e.dataTransfer.effectAllowed = 'copy';
@@ -593,7 +597,7 @@ document.querySelectorAll('.tool').forEach((tool) => {
 
 $('#diagram').addEventListener('dragstart', (e) => {
   const el = e.target.closest('.el');
-  if (!el) return;
+  if (!el || touch) { e.preventDefault(); return; }
   dragData = { id: el.dataset.id };
   e.dataTransfer.setData('text/plain', el.dataset.id);
   e.dataTransfer.effectAllowed = 'move';
@@ -609,10 +613,12 @@ function clearIndicator() {
   indicator = null;
 }
 
-$('#diagram').addEventListener('dragover', (e) => {
-  if (!dragData) return;
-  const empty = e.target.closest('.seq.empty');
-  const el = e.target.closest('.el');
+/** Work out where the dragged item would land for the element under the pointer.
+ *  Shows the insertion marker and returns true when dropping there is allowed. */
+function updateDrop(under, clientY) {
+  if (!dragData) return false;
+  const empty = under.closest('.seq.empty');
+  const el = under.closest('.el');
   let target = null;
   let mark = null;
   let after = false;
@@ -622,36 +628,44 @@ $('#diagram').addEventListener('dragover', (e) => {
   } else if (el) {
     const t = targetOf.get(el);
     const r = el.getBoundingClientRect();
-    after = e.clientY > r.top + r.height / 2;
+    after = clientY > r.top + r.height / 2;
     target = { list: t.list, index: t.index + (after ? 1 : 0) };
     mark = el;
   }
-  if (!target) { clearIndicator(); dropTarget = null; return; }
+  if (!target) { clearIndicator(); dropTarget = null; return false; }
 
   // a node can't be dropped into itself
   if (dragData.id) {
     const src = find(dragData.id);
     if (src.node === (el && find(el.dataset.id)?.node) || containsList(src.node, target.list)) {
-      clearIndicator(); dropTarget = null; return;
+      clearIndicator(); dropTarget = null; return false;
     }
   }
-  e.preventDefault();
   dropTarget = target;
   if (indicator !== mark) clearIndicator();
   indicator = mark;
   if (empty) mark.classList.add('empty-over');
   else mark.style.boxShadow = after ? 'inset 0 -4px 0 var(--accent)' : 'inset 0 4px 0 var(--accent)';
+  return true;
+}
+
+$('#diagram').addEventListener('dragover', (e) => {
+  if (updateDrop(e.target, e.clientY)) e.preventDefault();
 });
 
 $('#diagram').addEventListener('drop', (e) => {
   e.preventDefault();
-  if (!dragData || !dropTarget) return;
+  performDrop('drag');
+});
+
+function performDrop(method) {
+  if (!dragData || !dropTarget) { endDrag(); return; }
   snapshot();
   let { list, index } = dropTarget;
   let node;
   if (dragData.type) {
     node = createNode(dragData.type);
-    track('element_add', { element_type: dragData.type, method: 'drag' });
+    track('element_add', { element_type: dragData.type, method });
   } else {
     const src = find(dragData.id);
     node = src.node;
@@ -662,7 +676,7 @@ $('#diagram').addEventListener('drop', (e) => {
   selectedId = node.id;
   endDrag();
   commit();
-});
+}
 
 function endDrag() {
   clearIndicator();
@@ -672,6 +686,145 @@ function endDrag() {
   document.querySelectorAll('.dragged').forEach((d) => d.classList.remove('dragged'));
 }
 document.addEventListener('dragend', endDrag);
+
+/* ---------------- touch: drag & drop and double tap (iPad, phones) ----------------
+   Native HTML drag & drop is unreliable with fingers, so touches are handled here:
+   - diagram elements: press and hold briefly, then drag
+   - palette elements: hold, or slide sideways towards the diagram (vertical = scroll)
+   A floating copy follows the finger; the drop logic is shared with the mouse. */
+
+const LONG_PRESS = 300; // ms
+let touch = null; // { data, source, slide, x0, y0, x, y, timer, started, ghost }
+
+function touchPick(e, data, source, slide) {
+  if (e.touches.length !== 1 || touch) return;
+  const t = e.touches[0];
+  touch = { data, source, slide, x0: t.clientX, y0: t.clientY, x: t.clientX, y: t.clientY, started: false };
+  // stop iOS from starting its own drag on the same press
+  touch.wasDraggable = source.draggable;
+  source.draggable = false;
+  touch.timer = setTimeout(beginTouchDrag, LONG_PRESS);
+}
+
+function beginTouchDrag() {
+  clearTimeout(touch.timer);
+  touch.started = true;
+  dragData = touch.data;
+  document.body.classList.add('dragging');
+  const r = touch.source.getBoundingClientRect();
+  const ghost = touch.source.cloneNode(true);
+  ghost.classList.remove('selected');
+  ghost.classList.add('touch-ghost');
+  ghost.style.width = `${Math.min(r.width, 320)}px`;
+  document.body.append(ghost);
+  touch.ghost = ghost;
+  if (touch.data.id) touch.source.classList.add('dragged');
+  navigator.vibrate?.(10);
+  moveTouchDrag();
+  requestAnimationFrame(autoScroll);
+}
+
+function moveTouchDrag() {
+  const { x, y, ghost } = touch;
+  // above the finger, so the finger doesn't hide it
+  ghost.style.left = `${x - 24}px`;
+  ghost.style.top = `${y - ghost.offsetHeight - 18}px`;
+  const under = document.elementFromPoint(x, y);
+  if (under && $('#diagram').contains(under)) updateDrop(under, y);
+  else { clearIndicator(); dropTarget = null; }
+}
+
+/** Scroll the canvas while the finger rests near its edge. */
+function autoScroll() {
+  if (!touch?.started) return;
+  const c = $('#canvas');
+  const r = c.getBoundingClientRect();
+  const edge = 56;
+  const step = (d) => Math.round(Math.max(0, edge - d) / 4);
+  const inside = touch.x > r.left && touch.x < r.right && touch.y > r.top - edge && touch.y < r.bottom + edge;
+  if (inside) {
+    const dx = step(r.right - touch.x) - step(touch.x - r.left);
+    const dy = step(r.bottom - touch.y) - step(touch.y - r.top);
+    if (dx || dy) { c.scrollBy(dx, dy); moveTouchDrag(); }
+  }
+  requestAnimationFrame(autoScroll);
+}
+
+function releaseTouch() {
+  if (!touch) return;
+  clearTimeout(touch.timer);
+  touch.ghost?.remove();
+  touch.source.draggable = touch.wasDraggable;
+  touch = null;
+}
+
+document.querySelectorAll('.tool').forEach((tool) => {
+  tool.addEventListener('touchstart', (e) => touchPick(e, { type: tool.dataset.type }, tool, true), { passive: true });
+});
+$('#diagram').addEventListener('touchstart', (e) => {
+  const el = e.target.closest('.el');
+  if (el) touchPick(e, { id: el.dataset.id }, el, false);
+}, { passive: true });
+
+document.addEventListener('touchmove', (e) => {
+  if (!touch) return;
+  const t = e.touches[0];
+  touch.x = t.clientX;
+  touch.y = t.clientY;
+  if (!touch.started) {
+    const dx = touch.x - touch.x0;
+    const dy = touch.y - touch.y0;
+    if (Math.hypot(dx, dy) < 10) return;
+    if (touch.slide && Math.abs(dx) > Math.abs(dy) * 1.5) beginTouchDrag();
+    else { releaseTouch(); return; } // the finger is scrolling
+  }
+  if (e.cancelable) e.preventDefault();
+  moveTouchDrag();
+}, { passive: false });
+
+document.addEventListener('touchend', (e) => {
+  if (!touch) return;
+  const started = touch.started;
+  releaseTouch();
+  if (started) {
+    e.preventDefault(); // no click after a drag
+    performDrop('touch');
+  }
+}, { passive: false });
+
+document.addEventListener('touchcancel', () => {
+  if (touch?.started) endDrag();
+  releaseTouch();
+});
+
+// No long-press menu / text magnifier on elements that can be dragged
+document.addEventListener('contextmenu', (e) => {
+  if (e.target.closest?.('#diagram .el, .tool')) e.preventDefault();
+});
+
+/* Double tap acts as double click (edit element text, rename tab). It is dispatched
+   right in touchend so the on-screen keyboard can open for the focused field. */
+let lastTap = null;
+let syntheticDblAt = 0;
+document.addEventListener('touchend', (e) => {
+  if (e.defaultPrevented || e.changedTouches.length !== 1) { lastTap = null; return; }
+  const t = e.changedTouches[0];
+  const now = Date.now();
+  if (lastTap && lastTap.target === e.target && now - lastTap.time < 400
+      && Math.hypot(t.clientX - lastTap.x, t.clientY - lastTap.y) < 30) {
+    lastTap = null;
+    if (!e.target.closest('#diagram, .tab-name, .struct')) return;
+    e.preventDefault(); // keep the focus where the double click puts it
+    syntheticDblAt = now;
+    e.target.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true, clientX: t.clientX, clientY: t.clientY }));
+  } else {
+    lastTap = { target: e.target, time: now, x: t.clientX, y: t.clientY };
+  }
+}, { passive: false });
+// If the browser also sends its own double click, handle it only once
+document.addEventListener('dblclick', (e) => {
+  if (e.isTrusted && Date.now() - syntheticDblAt < 800) e.stopImmediatePropagation();
+}, true);
 
 /* ---------------- code export ---------------- */
 
@@ -784,6 +937,11 @@ function showCode() {
 /* ---------------- files & image ---------------- */
 
 function download(blob, filename) {
+  const file = new File([blob], filename, { type: blob.type });
+  if (navigator.standalone && navigator.canShare?.({ files: [file] })) {
+    navigator.share({ files: [file] }).catch(() => {});
+    return;
+  }
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = filename;
@@ -858,7 +1016,9 @@ function showElementInfo(type) {
 
 function showHelp() {
   const div = document.createElement('div');
-  const items = ['drag', 'select', 'move', 'keys', 'tabs', 'save'].map((k) => `<li>${tr(`help.${k}`)}</li>`).join('');
+  const keys = ['drag', 'select', 'move', 'keys', 'tabs', 'save'];
+  if (IS_TOUCH) keys.splice(3, 0, 'touch');
+  const items = keys.map((k) => `<li>${tr(`help.${k}`)}</li>`).join('');
   div.innerHTML = `
     <p>${tr('help.intro')}</p>
     <ul>${items}</ul>
@@ -1021,6 +1181,12 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ---------------- boot ---------------- */
+// iOS greys out files whose type it doesn't know (.struct), so allow picking any file there
+if (IS_IOS) $('#fileInput').removeAttribute('accept');
+// Offline support / installable web app
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('sw.js').catch(() => { /* offline mode unavailable */ });
+}
 applyLanguage();
 if (consent === 'granted') applyConsent();
 if (consent) showStart();
