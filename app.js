@@ -733,7 +733,7 @@ $('#diagram').addEventListener('dragstart', (e) => {
 function clearIndicator() {
   if (indicator) {
     indicator.style.boxShadow = '';
-    indicator.classList.remove('empty-over');
+    indicator.classList.remove('empty-over', 'end-over');
   }
   indicator = null;
 }
@@ -743,13 +743,18 @@ function clearIndicator() {
 function updateDrop(under, clientY) {
   if (!dragData) return false;
   const empty = under.closest('.seq.empty');
-  const el = under.closest('.el');
+  // free space below the last element of the (stretched) main sequence: append at the end
+  const end = !empty && under.matches('.struct > .seq') ? under : null;
+  const el = !end && under.closest('.el');
   let target = null;
   let mark = null;
   let after = false;
   if (empty) {
     target = targetOf.get(empty);
     mark = empty;
+  } else if (end) {
+    target = { list: diagram().body, index: diagram().body.length };
+    mark = end;
   } else if (el) {
     const t = targetOf.get(el);
     const r = el.getBoundingClientRect();
@@ -770,6 +775,7 @@ function updateDrop(under, clientY) {
   if (indicator !== mark) clearIndicator();
   indicator = mark;
   if (empty) mark.classList.add('empty-over');
+  else if (end) mark.classList.add('end-over');
   else mark.style.boxShadow = after ? 'inset 0 -4px 0 var(--accent)' : 'inset 0 4px 0 var(--accent)';
   return true;
 }
