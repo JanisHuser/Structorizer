@@ -117,14 +117,6 @@ function createNode(type) {
   return n;
 }
 
-function childLists(node) {
-  if (node.body) return [node.body];
-  if (node.type === 'if') return [node.yes, node.no];
-  if (node.cases) return node.cases.map((c) => c.body);
-  if (node.threads) return node.threads;
-  return [];
-}
-
 /** Find node by id -> { node, list, index } */
 function find(id, list = diagram().body) {
   for (let i = 0; i < list.length; i++) {
@@ -190,6 +182,7 @@ function loadProject(p) {
   selectedId = null;
   past = []; future = [];
   commit();
+  if (typeof renderTaskPanel === 'function') renderTaskPanel(); // learn.js
 }
 
 function newProject(title) {
@@ -244,6 +237,7 @@ function applyLanguage() {
     b.classList.toggle('active', active);
     b.setAttribute('aria-pressed', active);
   });
+  if (typeof renderTaskPanel === 'function') renderTaskPanel(); // texts of the exercise in the new language
 }
 
 /* ---------------- rendering ---------------- */
@@ -1245,6 +1239,7 @@ $('#langSelect').onchange = (e) => setLanguage(e.target.value);
 const actions = {
   new: showStart,
   samples: () => showSamples(),
+  learn: () => showLearning(),
   open: () => $('#fileInput').click(),
   save: saveFile,
   code: showCode,

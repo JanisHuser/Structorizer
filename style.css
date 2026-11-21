@@ -14,6 +14,8 @@
   --accent-text: #4343b8;
   --danger: #e5484d;
   --danger-soft: #fdecec;
+  --ok: #1a7f45;
+  --ok-soft: #e7f7ee;
   --dot: #d6d9e0;
 
   /* diagram (paper) */
@@ -52,6 +54,8 @@
     --accent-text: #b4b4ff;
     --danger: #ff6369;
     --danger-soft: #3b1a1c;
+    --ok: #5fd08f;
+    --ok-soft: #12321f;
     --dot: #252a33;
     --paper: #1b1e25;
     --line: #c9cdd6;
@@ -340,6 +344,72 @@ body.collapsed .collapse .arrow { font-size: 18px; transform: rotate(180deg); }
 .run-btn i { font-style: normal; font-size: 11px; }
 @media (hover: hover) { .run-btn:hover { background: var(--accent); color: #fff; } }
 
+/* =========================================================
+   Exercise (task panel, learn.js)
+   ========================================================= */
+.task-btn {
+  margin-left: auto; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 600; font-size: 13px;
+}
+.task-btn[hidden] { display: none; }
+.task-btn i { font-style: normal; font-size: 12px; }
+.task-btn.active { border-color: var(--accent); color: var(--accent-text); }
+.task-btn:not([hidden]) + .run-btn { margin-left: 0; }
+@media (hover: hover) { .task-btn:hover { background: var(--hover); } }
+
+#taskPanel {
+  width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; overflow-y: auto;
+  background: var(--surface); border-left: 1px solid var(--border); line-height: 1.5;
+}
+#taskPanel[hidden] { display: none; }
+#taskPanel header { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; }
+#taskPanel .close {
+  flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; border: 0; background: none; color: var(--muted); font-size: 20px; line-height: 1;
+}
+@media (hover: hover) { #taskPanel .close:hover { background: var(--hover); color: var(--text); } }
+#taskPanel h3 { margin: 6px 0 0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+#taskBody { display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; }
+.task-text p, .task-text ul, .task-text ol { margin: 0 0 6px; }
+.task-text ul, .task-text ol, .task-tests, .task-rules { padding-left: 18px; }
+.task-tests, .task-rules { margin: 0; font-size: 13px; }
+.task-tests li, .task-rules li { margin: 2px 0; }
+#taskPanel code {
+  font: 12px "JetBrains Mono", ui-monospace, Menlo, monospace; padding: 1px 5px; border-radius: 5px;
+  background: var(--code-bg); color: var(--code-text); border: 1px solid var(--code-border);
+}
+#taskPanel pre {
+  margin: 2px 0 4px; padding: 6px 8px; border-radius: 7px; white-space: pre-wrap; word-break: break-word;
+  background: var(--code-bg); color: var(--code-text); border: 1px solid var(--code-border);
+  font: 12px/1.45 "JetBrains Mono", ui-monospace, Menlo, monospace; max-height: 140px; overflow: auto;
+}
+#taskPanel .muted { color: var(--muted); }
+#taskPanel .err { color: var(--danger); font-weight: 500; }
+.task-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.task-actions button {
+  flex: 1; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-weight: 600; font-size: 13px;
+}
+.task-actions button[hidden] { display: none; }
+.task-actions .primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.task-actions button:disabled { opacity: .5; cursor: default; }
+@media (hover: hover) {
+  .task-actions button:not(:disabled):hover { background: var(--hover); }
+  .task-actions .primary:not(:disabled):hover { background: var(--accent); filter: brightness(1.08); }
+}
+#taskResult { display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+#taskResult:empty { display: none; }
+#taskResult p { margin: 2px 0; }
+.task-summary { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 8px 10px; border-radius: 8px; }
+.task-summary.ok { background: var(--ok-soft); color: var(--ok); }
+.task-summary.fail { background: var(--danger-soft); color: var(--danger); }
+.task-cat { padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); }
+.cat-head { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+.cat-head .pts { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cat-head .mark { font-weight: 700; }
+.task-cat.ok .mark { color: var(--ok); }
+.task-cat.fail .mark { color: var(--danger); }
+.task-fail { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); }
+.task-fail .cmp { font-size: 12px; color: var(--muted); }
+
 #runPanel {
   width: 290px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; overflow-y: auto;
   background: var(--surface); border-left: 1px solid var(--border);
@@ -421,9 +491,21 @@ body.running #diagram .el.selected { outline: 0; box-shadow: none; }
   #runPanel > .run-hint { display: none; }
   /* room to scroll the diagram above the panel */
   main:has(#runPanel:not([hidden])) #canvas { padding-bottom: 44vh; }
+  #taskPanel {
+    position: fixed; left: 0; right: 0; bottom: 0; width: auto; max-height: 42vh; z-index: 34;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    box-shadow: var(--shadow-lg); border-left: 0; border-top: 1px solid var(--border);
+  }
+  main:has(#taskPanel:not([hidden])) #canvas { padding-bottom: 44vh; }
+  main:has(#runPanel:not([hidden])) #taskPanel { display: none; }
 }
 @media (max-width: 480px) {
+  #taskPanel { max-height: 55vh; }
+  .task-btn span { display: none; } /* icon only: leave the room to the diagram tabs */
   #runPanel { grid-template-columns: 1fr; grid-template-areas: "head" "ctrl" "speed" "status" "vh" "vars" "oh" "out"; max-height: 55vh; }
+}
+@media (max-width: 1280px) {
+  main:has(#runPanel:not([hidden])) #taskPanel { display: none; }
 }
 /* Portrait iPad: a bit narrower sidebar, less padding around the diagram */
 @media (orientation: portrait) and (max-width: 1100px) {
@@ -520,6 +602,17 @@ dialog.info .close {
   border: 1px solid var(--border); background: var(--surface-2);
 }
 .sample b { font-size: 14px; }
+.sample:disabled { opacity: .5; }
+.entry-head { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+.entry-head .kind, .entry-head .status {
+  font-size: 11px !important; font-weight: 600; padding: 1px 7px; border-radius: 99px; line-height: 1.6 !important;
+}
+.entry-head .kind.example { background: var(--hover); color: var(--muted); }
+.entry-head .kind.exercise { background: var(--accent-soft); color: var(--accent-text) !important; }
+.entry-head .status { margin-left: auto; background: var(--surface); border: 1px solid var(--border); color: var(--muted); }
+.entry-head .status.passed { background: var(--ok-soft); color: var(--ok) !important; border-color: transparent; }
+.learn h3 { margin: 16px 0 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.learn > .hint { margin-top: 4px; }
 .sample span { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
 @media (hover: hover) { .sample:hover { border-color: var(--accent); background: var(--accent-soft); } }
 @media (hover: none) { .sample:active { border-color: var(--accent); background: var(--accent-soft); } }

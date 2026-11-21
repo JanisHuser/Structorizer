@@ -11,11 +11,21 @@
 
    Element texts may be written Java/C-style or Python-style; common statements
    (output, input, operators, literals, ++) are translated to the target language.
-   Also used by run.js: lines, isDefault, ident, parseFor, signature, splitTop.
+   Also used by app.js, engine.js and grader.js: childLists, lines, isDefault, ident, parseFor,
+   signature, splitTop. Loaded before app.js.
    ========================================================= */
 
 const lines = (t) => (t || '').split('\n').filter((l) => l.trim());
 const isDefault = (c) => c.auto || /^(sonst|default|else|otherwise|sinon|altrimenti|_)$/i.test(c.label.trim());
+/** The lists of child elements of an element (loop body, if branches, cases, threads). */
+function childLists(node) {
+  if (node.body) return [node.body];
+  if (node.type === 'if') return [node.yes, node.no];
+  if (node.cases) return node.cases.map((c) => c.body);
+  if (node.threads) return node.threads;
+  return [];
+}
+
 const ident = (s) => s.replace(/\W+/g, '_').replace(/^(\d)/, '_$1') || 'f';
 
 /* ---------------- small text helpers ---------------- */
