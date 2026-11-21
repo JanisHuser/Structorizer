@@ -1,19 +1,24 @@
 'use strict';
 /* Offline support: the app shell is cached on install; pages are fetched fresh
    when online (cache as fallback), other files are served from the cache and
-   refreshed in the background. Bump VERSION whenever a precached file changes. */
+   refreshed in the background. Bump VERSION whenever a precached file changes.
+   The library (../structorizer-library, same origin) is cached as it is fetched;
+   learn.js fetches all of its files once so that it works offline too. */
 
-const VERSION = 'v17';
+const VERSION = 'v20';
 const CACHE = `structorizer-${VERSION}`;
 const SHELL = [
   './',
   'index.html',
-  'style.css?v=20',
-  'i18n.js?v=12',
-  'app.js?v=15',
-  'codegen.js?v=1',
-  'run.js?v=5',
-  'samples.js?v=1',
+  'style.css?v=22',
+  'i18n.js?v=13',
+  'codegen.js?v=2',
+  'engine.js?v=1',
+  'grader.js?v=1',
+  'library.js?v=2',
+  'app.js?v=16',
+  'run.js?v=6',
+  'learn.js?v=1',
   'favicon.svg',
   'manifest.webmanifest',
   'icons/icon-192.png',
